@@ -1,0 +1,52 @@
+binaries -
+
+electgen - randomly generate election
+    stdin = [optional] csv
+    "choice name, weight, 1st (1-N), 2nd (1-N), ..."
+
+    flags
+    - rand  = [bool] randomly generate (ignores stdin)
+        - vote  = [int] number of voters
+        - peak  = [bool] peak preference
+    - cond  = [bool] force condorcet winner
+    - pref  = [bool] force preference (some candidate 'a' > 'b' for all voters)
+
+    stdout: vote matrix json
+    {
+        "1": //choice id (any string)
+        {
+            "A":
+            {"
+                "weight": 5,
+                "rank":   3,
+            },
+            ...
+        },
+        ...
+    }
+
+tally - tallies election results
+    flags
+    - type = [string: slater, kemeny, bucklin, second order copeland, STV, borda, all] default: all. Election types to tally
+
+    - output
+    {
+        "slater": ["4", "2", "3", "1"], //order is implicit - "4" is rank 1, "2" is rank 2, ...
+        "kemeny": ["4", "2", "3", "1"],
+        "condorcet": "4",
+        ...
+    }
+
+report - pretty print election results
+    stdin = newline separated election results (json)
+
+    flags
+    - type = [string] (csv, viz, table)
+
+possible binaries for part II
+    -compare results
+    -find condorcet winner from election
+    -condorcet winner is not the winner
+    -remove (irrelevant?) candidate from election
+    -find manipulation
+    -find single peaked preferences
