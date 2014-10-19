@@ -6,23 +6,28 @@ electgen - randomly generate election
 
     flags
     - rand  = [bool] randomly generate (ignores stdin)
-        - vote  = [int] number of voters
-        - peak  = [bool] peak preference
+    - vote  = [int] number of voters
+    - peak  = [bool] peak preference
     - cond  = [bool] force condorcet winner
     - pref  = [bool] force preference (some candidate 'a' > 'b' for all voters)
 
     stdout: vote matrix json
     {
-        "1": //choice id (any string)
-        {
-            "A":
-            {"
-                "weight": 5,
-                "rank":   3,
+        [
+            {
+                "A": //candidate id (any string)
+                {"
+                    "weight": 5,
+                    "rank":   3,
+                },
+                ...
             },
             ...
-        },
-        ...
+        ]
+        "candidates": 2,
+        "favorite": 3, // candidate that is preferred (optional)
+        "peak": 4, // peak candidate(optional)
+        "condorcet": false, // condorcet winner exists
     }
 
 tally - tallies election results
