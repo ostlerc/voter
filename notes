@@ -1,6 +1,6 @@
 binaries -
 
-electgen - randomly generate election
+egen - randomly generate an election
     stdin = [optional] csv
     "choice name, weight, 1st (1-N), 2nd (1-N), ..."
 

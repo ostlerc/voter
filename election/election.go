@@ -9,7 +9,7 @@ import (
 var (
 	random     = flag.Bool("rand", false, "Activate random generation")
 	fix        = flag.Bool("fix", false, "Use fixed random seed")
-	Votes      = flag.Int("Votes", 6, "Number of voters in election")
+	Votes      = flag.Int("vote", 6, "Number of voters in election")
 	Candidates = flag.Int("cand", 3, "Number of candidates in election")
 
 	R = rand.New(rand.NewSource(time.Now().Unix()))
@@ -19,19 +19,26 @@ type Vote struct {
 	C map[string]int `json:"vote"`
 }
 
+type Favorite struct {
+	A, B int
+}
+
 type Election struct {
-	N int    `json:"candidates"`
-	F int    `json:"favorite,omitempty"`
-	P int    `json:"peak,omitempty"`
-	C bool   `json:"condorcet"`
-	V []Vote `json:"votes"`
+	N int       `json:"candidates"`
+	F *Favorite `json:"favorite,omitempty"`
+	P int       `json:"peak,omitempty"`
+	C bool      `json:"condorcet"`
+	V []Vote    `json:"votes"`
 }
 
 func init() {
-	flag.Parse()
 	if *random {
 		*Votes = max(R.Intn(*Votes), 3)           //minimum of 3 votes
 		*Candidates = max(R.Intn(*Candidates), 3) //minimum of 3 votes
+	}
+
+	if *fix {
+		R = rand.New(rand.NewSource(99))
 	}
 }
 
@@ -40,10 +47,6 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func RandCand(l []int) int {
-	return R.Intn(len(l))
 }
 
 func RemoveAt(i int, l []int) []int {
@@ -57,6 +60,15 @@ func RemoveValue(v int, l []int) []int {
 		}
 	}
 	panic("No value")
+}
+
+func Index(v int, l []int) int {
+	for i := 0; i < len(l); i++ {
+		if v == l[i] {
+			return i
+		}
+	}
+	return -1
 }
 
 func Contains(v int, l []int) bool {
