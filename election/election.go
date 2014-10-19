@@ -42,11 +42,30 @@ func max(a, b int) int {
 	return b
 }
 
-func PickCand(l []int) ([]int, int) {
-	i := R.Intn(len(l))
-	res := l[i]
-	l = append(l[:i], l[i+1:]...)
-	return l, res
+func RandCand(l []int) int {
+	return R.Intn(len(l))
+}
+
+func RemoveAt(i int, l []int) []int {
+	return append(l[:i], l[i+1:]...)
+}
+
+func RemoveValue(v int, l []int) []int {
+	for i := 0; i < len(l); i++ {
+		if v == l[i] {
+			return RemoveAt(i, l)
+		}
+	}
+	panic("No value")
+}
+
+func Contains(v int, l []int) bool {
+	for i := 0; i < len(l); i++ {
+		if v == l[i] {
+			return true
+		}
+	}
+	return false
 }
 
 func New() *Election {

@@ -28,7 +28,9 @@ func main() {
 			candidates[j] = j
 		}
 		for j := 0; j < *election.Candidates; j++ {
-			candidates, v.C[strconv.Itoa(j)] = election.PickCand(candidates)
+			k := election.RandCand(candidates)
+			v.C[strconv.Itoa(j)] = candidates[k]
+			candidates = election.RemoveAt(k, candidates)
 		}
 		e.V[i] = v
 	}
