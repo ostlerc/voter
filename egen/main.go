@@ -34,8 +34,14 @@ func main() {
 		}
 
 		e.F = f
-		orderer = &PreferOrder{f: f}
+		orderer = &PreferOrder{
+			f:    f,
+			peak: *peak,
+		}
 	}
+
+	fmt.Println(`{"peak":"`, *peak, `"}`)
+	e.P = *peak
 
 	for i := 0; i < *election.Votes; i++ {
 		v := election.NewVote()

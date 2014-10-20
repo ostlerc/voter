@@ -26,7 +26,7 @@ type Favorite struct {
 type Election struct {
 	N int       `json:"candidates"`
 	F *Favorite `json:"favorite,omitempty"`
-	P int       `json:"peak,omitempty"`
+	P bool      `json:"peak"`
 	C bool      `json:"condorcet"`
 	V []Vote    `json:"votes"`
 }
