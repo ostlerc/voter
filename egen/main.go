@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"strconv"
 
 	"github.com/ostlerc/voter/election"
 )
@@ -14,42 +13,39 @@ var (
 	cond = flag.Bool("cond", false, "Force condorcet winner")
 	pref = flag.Bool("pref", false, "Force preference of some candidate")
 
-	orderer = Orderer(&RandOrder{})
+	voter = Voter(&RandVoter{})
 )
 
 func init() {
 	flag.Parse()
+	election.Setup()
 }
 
 func main() {
 	e := election.New()
 	if *pref {
-		f := &election.Favorite{ //prefer a over b (always)
-			A: election.R.Intn(*election.Candidates),
-			B: election.R.Intn(*election.Candidates),
+		f := &election.IntPair{ //prefer a over b (always)
+			First:  election.R.Intn(*election.Candidates),
+			Second: election.R.Intn(*election.Candidates),
 		}
 
-		for f.A == f.B { //verify unique random values
-			f.B = election.R.Intn(*election.Candidates)
+		for f.First == f.Second { //verify unique random values
+			f.Second = election.R.Intn(*election.Candidates)
 		}
 
 		e.F = f
-		orderer = &PreferOrder{
+		voter = &PreferVoter{
 			f:    f,
 			peak: *peak,
 		}
+	} else if *peak {
+		voter = &PeakVoter{}
 	}
 
-	fmt.Println(`{"peak":"`, *peak, `"}`)
 	e.P = *peak
 
 	for i := 0; i < *election.Votes; i++ {
-		v := election.NewVote()
-		o := orderer.Order(*election.Candidates)
-		for j := 0; j < len(o); j++ {
-			v.C[strconv.Itoa(j)] = o[j]
-		}
-		e.V[i] = v
+		e.V[i] = voter.Vote(*election.Candidates)
 	}
 
 	dat, err := json.Marshal(&e)

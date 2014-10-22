@@ -1,56 +1,75 @@
 package main
 
-import "github.com/ostlerc/voter/election"
+import (
+	"strconv"
 
-// Orderer returns an ordering of candidates
-type Orderer interface {
-	Order(int) []int
+	"github.com/ostlerc/voter/election"
+)
+
+// Voter returns an vote with n candidates
+type Voter interface {
+	Vote(n int) *election.Vote
 }
 
-type PreferOrder struct {
-	f    *election.Favorite
+type PreferVoter struct {
+	f    *election.IntPair
 	peak bool
 }
-type RandOrder struct{}
+type RandVoter struct{}
+type PeakVoter struct{}
 
-func (*RandOrder) Order(n int) []int {
-	return order(n)
+func (*RandVoter) Vote(n int) *election.Vote {
+	return vote(n)
 }
 
-func order(n int) []int {
-	res := make([]int, 0)
+func (*PeakVoter) Vote(n int) *election.Vote {
+	p := election.R.Intn(n)
+	e := peakvote(p, n)
+	e.Peak = p
+	return e
+}
+
+func vote(n int) *election.Vote {
+	vote := election.NewVote()
 	for i := 0; i < n; i++ {
-		v := election.R.Intn(n)
-		for election.Contains(v, res) {
-			v = election.R.Intn(n)
+		r := election.Strn(n)
+		for vote.Contains(r) {
+			r = election.Strn(n)
 		}
-		res = append(res, v)
+		vote.C[r] = i
 	}
-	return res
+	return vote
 }
 
-func peakorder(p, n int) []int {
-	res := make([]int, 0)
+func peakvote(p, n int) *election.Vote {
+	res := election.NewVote()
+	res.C["0"] = p
+
 	l := p - 1
 	r := p + 1
-	res = append(res, p)
-	for l != -1 || r != n {
+
+	for i := 1; l != -1 || r != n; i++ {
+		istr := strconv.Itoa(i)
 		if l != -1 && r != n {
 			if election.R.Intn(2) == 0 {
-				res = append(res, l)
+				res.C[istr] = l
 				l--
 			} else {
-				res = append(res, r)
+				res.C[istr] = r
 				r++
 			}
 		} else if l == -1 {
 			for ; r != n; r++ {
-				res = append(res, r)
+				res.C[istr] = r
+				i++
+				istr = strconv.Itoa(i)
 			}
 			return res
 		} else {
 			for ; l != -1; l-- {
-				res = append(res, l)
+				res.C[istr] = l
+				i++
+				istr = strconv.Itoa(i)
 			}
 			return res
 		}
@@ -58,24 +77,25 @@ func peakorder(p, n int) []int {
 	return res
 }
 
-func (p *PreferOrder) Order(n int) []int {
-	var res []int
+func (p *PreferVoter) Vote(n int) *election.Vote {
+	var res *election.Vote
 
 	if p.peak {
 		pn := election.R.Intn(n)
-		for pn == p.f.B { //anything but that...
+		for pn == p.f.Second { //anything but that...
 			pn = election.R.Intn(n)
 		}
-		res = peakorder(pn, n)
+		res = peakvote(pn, n)
+		res.Peak = pn
 	} else {
-		res = order(n)
+		res = vote(n)
 	}
 
-	aidx := election.Index(p.f.A, res)
-	bidx := election.Index(p.f.B, res)
+	aidx := res.Rank(p.f.First)
+	bidx := res.Rank(p.f.Second)
 	if aidx > bidx {
-		res[aidx] = p.f.B
-		res[bidx] = p.f.A
+		res.C[aidx] = p.f.Second
+		res.C[bidx] = p.f.First
 	}
 	return res
 }
