@@ -1,33 +1,42 @@
 binaries -
 
 egen - randomly generate an election
-    stdin = [optional] csv
-    "choice name, weight, 1st (1-N), 2nd (1-N), ..."
+    stdin = <none>
 
     flags
-    - rand  = [bool] randomly generate (ignores stdin)
-    - vote  = [int] number of voters
-    - peak  = [bool] peak preference
-    - cond  = [bool] force condorcet winner
-    - pref  = [bool] force preference (some candidate 'a' > 'b' for all voters)
+    -cand=3: Number of candidates in election
+    -cond=false: Force condorcet winner
+    -fix=false: Use fixed random seed
+    -peak=false: Force generation with peak preference
+    -pref=false: Force preference of some candidate
+    -rand=false: Use a random vote/cand count
+    -vote=6: Number of voters in election
 
     stdout: vote matrix json
     {
+        "votes":
         [
             {
-                "A": //candidate id (any string)
-                {"
-                    "weight": 5,
-                    "rank":   3,
-                },
+                "peak": 0,
+                "vote": {
+                    "0": 0
+                    "1": 2,
+                    "2": 1,
+                }
+            },
+            {
                 ...
             },
-            ...
-        ]
-        "candidates": 2,
-        "favorite": 3, // candidate that is preferred (optional)
-        "peak": 4, // peak candidate(optional)
-        "condorcet": false, // condorcet winner exists
+        ],
+
+        "peak": true,
+        "pref": {
+            "b": 1,
+            "a": 2
+        }
+        "rank": [ 4, 3, 5, 0, 0, 0 ],
+        "condorcet": 2,
+        "candidates": 3
     }
 
 tally - tallies election results
@@ -50,7 +59,6 @@ report - pretty print election results
 
 possible binaries for part II
     -compare results
-    -find condorcet winner from election
     -condorcet winner is not the winner
     -remove (irrelevant?) candidate from election
     -find manipulation

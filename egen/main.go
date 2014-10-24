@@ -42,11 +42,19 @@ func main() {
 		voter = &PeakVoter{}
 	}
 
-	e.P = *peak
+	if *peak {
+		e.P = peak
+	}
 
 	for i := 0; i < *election.Votes; i++ {
 		e.V[i] = voter.Vote(*election.Candidates)
 	}
+
+	c := e.Condorcet()
+	if c != -1 {
+		e.C = &c
+	}
+	e.R = e.Rank()
 
 	dat, err := json.Marshal(&e)
 	if err != nil {

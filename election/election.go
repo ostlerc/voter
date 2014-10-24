@@ -18,7 +18,7 @@ var (
 
 type Vote struct {
 	C    map[string]int `json:"vote"`
-	Peak int            `json:"peak"`
+	Peak *int           `json:"peak,omitempty"`
 }
 
 type IntPair struct {
@@ -29,8 +29,9 @@ type IntPair struct {
 type Election struct {
 	N int      `json:"candidates"`
 	F *IntPair `json:"pref,omitempty"`
-	P bool     `json:"peak"`
-	C bool     `json:"condorcet"`
+	P *bool    `json:"peak,omitempty"`
+	C *int     `json:"condorcet,omitempty"`
+	R []int    `json:"rank"`
 	V []*Vote  `json:"votes"`
 }
 
@@ -45,7 +46,72 @@ func Setup() { //Requires flag.parse to have been called
 	}
 }
 
-func init() {
+//cmp returns -1 if a beats b, 1 if b beats a and 0 if a tie
+func (e *Election) cmp(a, b int) int {
+	acnt := 0
+	bcnt := 0
+
+	for _, v := range e.V {
+		for i := 0; i < len(v.C); i++ {
+			x := v.C[strconv.Itoa(i)]
+			if x == a {
+				acnt++
+				break
+			}
+			if x == b {
+				bcnt++
+				break
+			}
+		}
+	}
+	if acnt == bcnt {
+		return 0
+	}
+	if acnt > bcnt {
+		return -1
+	}
+	return 1
+}
+
+//Rank returns int array of how many individual wins each candidate has
+func (e *Election) Rank() []int {
+	res := make([]int, len(e.V))
+	for i := 0; i < len(e.V); i++ {
+		for j := i + 1; j < len(e.V); j++ {
+			r := e.cmp(i, j)
+			if r == -1 {
+				res[i]++
+			} else if r == 1 {
+				res[j]++
+			}
+		}
+	}
+	return res
+}
+
+//Condorcet returns the condorcet winner as an int. -1 is returned if no winner is found
+func (e *Election) Condorcet() int {
+	max := 0
+	imax := 0
+	res := e.Rank()
+	for i, v := range res {
+		if v > max {
+			imax = i
+			max = v
+		}
+	}
+
+	f := false
+	for _, v := range res {
+		if v == max {
+			if f {
+				return -1
+			}
+			f = true
+		}
+	}
+
+	return imax
 }
 
 func max(a, b int) int {
@@ -113,7 +179,6 @@ func New() *Election {
 
 func NewVote() *Vote {
 	return &Vote{
-		C:    make(map[string]int),
-		Peak: -1,
+		C: make(map[string]int),
 	}
 }
