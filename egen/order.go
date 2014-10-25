@@ -147,7 +147,7 @@ func csvElection(e *election.Election, r io.Reader) {
 				continue
 			}
 			if x == 0 { //handle name map
-				e.M[col] = strconv.Itoa(y - 1)
+				e.M[strconv.Itoa(y-1)] = col
 				continue
 			}
 
