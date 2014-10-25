@@ -59,6 +59,13 @@ func main() {
 	}
 
 	c, ranks := e.Condorcet()
+
+	for *cond && c == -1 { //continually make more until we have a condorcet winner. slow but it works
+		i := election.R.Intn(*Votes)
+		e.V[i] = voter.Vote(*Candidates)
+		c, ranks = e.Condorcet()
+	}
+
 	if c != -1 {
 		e.C = &c
 	}
