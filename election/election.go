@@ -147,3 +147,10 @@ func NewVote(w int) *Vote {
 		W: w,
 	}
 }
+
+func GetName(M map[string]string, v string) string {
+	if s, ok := M[v]; ok {
+		return s
+	}
+	return v
+}

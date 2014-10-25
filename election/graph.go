@@ -8,10 +8,14 @@ import (
 
 type Egraph struct {
 	Nodes map[int]map[int]int
+	names map[string]string
 }
 
 func (e *Election) Graph() *Egraph {
-	g := &Egraph{Nodes: make(map[int]map[int]int)}
+	g := &Egraph{
+		Nodes: make(map[int]map[int]int),
+		names: e.M,
+	}
 	for i := 0; i < e.N; i++ {
 		g.Nodes[i] = make(map[int]int)
 	}
@@ -29,7 +33,10 @@ func (e *Election) Graph() *Egraph {
 }
 
 func (e *Egraph) Edges() *Egraph {
-	g := &Egraph{Nodes: make(map[int]map[int]int)}
+	g := &Egraph{
+		Nodes: make(map[int]map[int]int),
+		names: e.names,
+	}
 	for i := 0; i < len(e.Nodes); i++ {
 		g.Nodes[i] = make(map[int]int)
 	}
@@ -51,7 +58,7 @@ func (e *Egraph) Dot() string {
 	for a, m := range e.Nodes {
 		for b, w := range m {
 			if w != 0 {
-				res += fmt.Sprintf("\t"+`%d -> %d [label="%d"];`+"\n", a, b, w)
+				res += fmt.Sprintf("\t"+`%s -> %s [label="%d"];`+"\n", GetName(e.names, strconv.Itoa(a)), GetName(e.names, strconv.Itoa(b)), w)
 			}
 		}
 	}
