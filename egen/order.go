@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"io"
 	"io/ioutil"
 	"log"
@@ -35,7 +34,7 @@ func (*PeakVoter) Vote(n int) *election.Vote {
 }
 
 func vote(n int) *election.Vote {
-	vote := election.NewVote()
+	vote := election.NewVote(election.R.Intn(*weight) + 1)
 	for i := 0; i < n; i++ {
 		r := election.Strn(n)
 		for vote.Contains(r) {
@@ -47,7 +46,7 @@ func vote(n int) *election.Vote {
 }
 
 func peakvote(p, n int) *election.Vote {
-	res := election.NewVote()
+	res := election.NewVote(election.R.Intn(*weight) + 1)
 	res.C["0"] = p
 
 	l := p - 1
@@ -106,13 +105,6 @@ func (p *PreferVoter) Vote(n int) *election.Vote {
 	return res
 }
 
-type csvVoter struct {
-	r       *bufio.Reader
-	weights []int
-	M       map[string]string
-	count   int
-}
-
 func csvElection(e *election.Election, r io.Reader) {
 	dat, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -120,7 +112,6 @@ func csvElection(e *election.Election, r io.Reader) {
 	}
 
 	file := strings.Split(string(dat), "\n")
-	weights := make([]int, 0)
 
 	*Candidates = len(file) - 1
 	*Votes = 0
@@ -141,9 +132,8 @@ func csvElection(e *election.Election, r io.Reader) {
 				if err != nil {
 					log.Fatal(err)
 				}
-				*Votes += iw
-				weights = append(weights, iw)
-				e.V = append(e.V, &election.Vote{C: make(map[string]int)})
+				*Votes++
+				e.V = append(e.V, &election.Vote{C: make(map[string]int), W: iw})
 				continue
 			}
 			if x == 0 { //handle name map
@@ -157,12 +147,6 @@ func csvElection(e *election.Election, r io.Reader) {
 			}
 			e.V[x-1].C[strconv.Itoa(y-1)] = icol - 1
 
-		}
-	}
-
-	for j, w := range weights {
-		for i := 1; i < w; i++ { //add vote w-1 times
-			e.V = append(e.V, e.V[j])
 		}
 	}
 

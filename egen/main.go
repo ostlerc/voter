@@ -14,7 +14,8 @@ var (
 	peak       = flag.Bool("peak", false, "Force generation with peak preference")
 	cond       = flag.Bool("cond", false, "Force condorcet winner")
 	pref       = flag.Bool("pref", false, "Force preference of some candidate")
-	Votes      = flag.Int("vote", 6, "Number of voters in election")
+	weight     = flag.Int("weight", 5, "Maximum weight of a vote")
+	Votes      = flag.Int("vote", 4, "Number of voters in election")
 	Candidates = flag.Int("cand", 3, "Number of candidates in election")
 	random     = flag.Bool("rand", false, "Use a random vote/cand count")
 

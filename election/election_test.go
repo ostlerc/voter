@@ -4,9 +4,9 @@ import "testing"
 
 func TestCmp(t *testing.T) {
 	e := &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}},
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}},
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}}},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
 	}
 
 	v := e.cmp(1, 2)
@@ -19,8 +19,8 @@ func TestCmp(t *testing.T) {
 	}
 
 	e = &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}},
-		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}}},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 1}},
 	}
 	v = e.cmp(1, 0)
 	if v != 0 {
@@ -34,9 +34,9 @@ func TestCmp(t *testing.T) {
 
 func TestCondorcet(t *testing.T) {
 	e := &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}},
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}},
-		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}}},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
 		N: 3}
 
 	if e.Condorcet() != 1 {
@@ -44,9 +44,9 @@ func TestCondorcet(t *testing.T) {
 	}
 
 	e = &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 1, "1": 0, "2": 2}},
-		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}},
-		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}}},
+		&Vote{C: map[string]int{"0": 1, "1": 0, "2": 2}, W: 1},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 1}},
 		N: 3}
 
 	if e.Condorcet() != -1 {
@@ -54,8 +54,8 @@ func TestCondorcet(t *testing.T) {
 	}
 
 	e = &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 1, "1": 0}},
-		&Vote{C: map[string]int{"0": 0, "1": 1}}},
+		&Vote{C: map[string]int{"0": 1, "1": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 0, "1": 1}, W: 1}},
 		N: 2}
 
 	if e.Condorcet() != -1 {
@@ -63,8 +63,8 @@ func TestCondorcet(t *testing.T) {
 	}
 
 	e = &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 1, "1": 0}},
-		&Vote{C: map[string]int{"0": 1, "1": 0}}},
+		&Vote{C: map[string]int{"0": 1, "1": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 0}, W: 1}},
 		N: 2}
 
 	if e.Condorcet() != 1 {
@@ -72,8 +72,8 @@ func TestCondorcet(t *testing.T) {
 	}
 
 	e = &Election{V: []*Vote{
-		&Vote{C: map[string]int{"0": 0, "1": 1}},
-		&Vote{C: map[string]int{"0": 0, "1": 1}}},
+		&Vote{C: map[string]int{"0": 0, "1": 1}, W: 1},
+		&Vote{C: map[string]int{"0": 0, "1": 1}, W: 1}},
 		N: 2}
 
 	if e.Condorcet() != 0 {

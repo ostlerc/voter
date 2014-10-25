@@ -26,6 +26,7 @@ type Election struct {
 
 type Vote struct {
 	C    map[string]int `json:"vote"`
+	W    int            `json:"weight"`
 	Peak *int           `json:"peak,omitempty"`
 }
 
@@ -43,11 +44,11 @@ func (e *Election) cmp(a, b int) int {
 		for i := 0; i < len(v.C); i++ {
 			x := v.C[strconv.Itoa(i)]
 			if x == a {
-				cnt--
+				cnt -= v.W
 				break
 			}
 			if x == b {
-				cnt++
+				cnt += v.W
 				break
 			}
 		}
@@ -140,8 +141,9 @@ func New(v, c int) *Election {
 	}
 }
 
-func NewVote() *Vote {
+func NewVote(w int) *Vote {
 	return &Vote{
 		C: make(map[string]int),
+		W: w,
 	}
 }
