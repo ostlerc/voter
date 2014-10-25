@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/ostlerc/voter/election"
 )
@@ -29,21 +31,12 @@ func init() {
 	}
 }
 
-func main() {
+func Campaign() *election.Election {
 	e := election.New(*Votes, *Candidates)
 	if *pref {
-		f := &election.IntPair{ //prefer a over b (always)
-			First:  election.R.Intn(*Candidates),
-			Second: election.R.Intn(*Candidates),
-		}
-
-		for f.First == f.Second { //verify unique random values
-			f.Second = election.R.Intn(*Candidates)
-		}
-
-		e.F = f
+		e.F = election.NewPref(*Candidates)
 		voter = &PreferVoter{
-			f:    f,
+			f:    e.F,
 			peak: *peak,
 		}
 	} else if *peak {
@@ -54,22 +47,47 @@ func main() {
 		e.P = peak
 	}
 
-	for i := 0; i < *Votes; i++ {
-		e.V[i] = voter.Vote(*Candidates)
-	}
+	return e
+}
 
-	c, ranks := e.Condorcet()
+func Fix(e *election.Election) {
+	if *pref {
+		for _, v := range e.V {
+			v.Prefer(e.F)
+		}
+	}
+	c := e.Condorcet()
 
 	for *cond && c == -1 { //continually make more until we have a condorcet winner. slow but it works
 		i := election.R.Intn(*Votes)
 		e.V[i] = voter.Vote(*Candidates)
-		c, ranks = e.Condorcet()
+		c = e.Condorcet()
 	}
 
 	if c != -1 {
 		e.C = &c
 	}
-	e.R = ranks
+
+}
+
+func main() {
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+	hasStdin := (stat.Mode() & os.ModeCharDevice) == 0
+
+	e := Campaign()
+
+	if hasStdin { //read in csv and create election from it
+		csvElection(e, os.Stdin)
+	} else {
+		for i := 0; i < *Votes; i++ {
+			e.V[i] = voter.Vote(*Candidates)
+		}
+	}
+
+	Fix(e)
 
 	dat, err := json.Marshal(&e)
 	if err != nil {

@@ -2,6 +2,7 @@ package election
 
 import (
 	"flag"
+	"log"
 	"math/rand"
 	"strconv"
 	"time"
@@ -14,12 +15,13 @@ var (
 )
 
 type Election struct {
-	N int      `json:"candidates"`
-	F *IntPair `json:"pref,omitempty"`
-	P *bool    `json:"peak,omitempty"`
-	C *int     `json:"condorcet,omitempty"`
-	R []int    `json:"rank"`
-	V []*Vote  `json:"votes"`
+	N int               `json:"candidates"`
+	F *IntPair          `json:"pref,omitempty"`
+	P *bool             `json:"peak,omitempty"`
+	C *int              `json:"condorcet,omitempty"`
+	R []int             `json:"ranks"`
+	M map[string]string `json:"names"`
+	V []*Vote           `json:"votes"`
 }
 
 type Vote struct {
@@ -31,7 +33,6 @@ func Setup() { //Requires flag.parse to have been called
 	if *fix {
 		R = rand.New(rand.NewSource(99))
 	}
-
 }
 
 //cmp returns <0 if a beats b, >0 if b beats a and 0 if a tie
@@ -71,11 +72,11 @@ func (e *Election) Rank() []int {
 }
 
 //Condorcet returns the condorcet winner as an int. -1 is returned if no winner is found
-func (e *Election) Condorcet() (int, []int) {
+func (e *Election) Condorcet() int {
 	max := 0
 	imax := 0
-	res := e.Rank()
-	for i, v := range res {
+	e.R = e.Rank()
+	for i, v := range e.R {
 		if v > max {
 			imax = i
 			max = v
@@ -83,21 +84,30 @@ func (e *Election) Condorcet() (int, []int) {
 	}
 
 	f := false
-	for _, v := range res {
+	for _, v := range e.R {
 		if v == max {
 			if f {
-				return -1, []int{}
+				return -1
 			}
 			f = true
 		}
 	}
 
-	return imax, res
+	return imax
 }
 
 func (v *Vote) Contains(k string) bool {
 	_, ok := v.C[k]
 	return ok
+}
+
+func (v *Vote) Prefer(f *IntPair) {
+	aidx := v.Rank(f.First)
+	bidx := v.Rank(f.Second)
+	if aidx > bidx {
+		v.C[aidx] = f.Second
+		v.C[bidx] = f.First
+	}
 }
 
 func (v *Vote) Rank(k int) string {
@@ -106,13 +116,27 @@ func (v *Vote) Rank(k int) string {
 			return key
 		}
 	}
-	panic("Not found")
+	log.Println(k, v.C)
+	panic("Not Found")
+}
+
+func NewPref(c int) *IntPair {
+	f := &IntPair{ //prefer a over b (always)
+		First:  R.Intn(c),
+		Second: R.Intn(c),
+	}
+
+	for f.First == f.Second { //verify unique random values
+		f.Second = R.Intn(c)
+	}
+	return f
 }
 
 func New(v, c int) *Election {
 	return &Election{
 		V: make([]*Vote, v),
 		N: c,
+		M: make(map[string]string),
 	}
 }
 
