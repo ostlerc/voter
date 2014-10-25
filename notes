@@ -42,6 +42,8 @@ egen - randomly generate an election
 tally - tallies election results
     flags
     - type = [string: slater, kemeny, bucklin, second order copeland, STV, borda, all] default: all. Election types to tally
+    slater = minimum lines swapped
+    kemeny = minimum weight swapped
 
     - output
     {

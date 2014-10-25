@@ -8,23 +8,10 @@ import (
 )
 
 var (
-	random     = flag.Bool("rand", false, "Use a random vote/cand count")
-	fix        = flag.Bool("fix", false, "Use fixed random seed")
-	Votes      = flag.Int("vote", 6, "Number of voters in election")
-	Candidates = flag.Int("cand", 3, "Number of candidates in election")
+	fix = flag.Bool("fix", false, "Use fixed random seed")
 
 	R = rand.New(rand.NewSource(time.Now().Unix()))
 )
-
-type Vote struct {
-	C    map[string]int `json:"vote"`
-	Peak *int           `json:"peak,omitempty"`
-}
-
-type IntPair struct {
-	First  int `json:"a"`
-	Second int `json:"b"`
-}
 
 type Election struct {
 	N int      `json:"candidates"`
@@ -35,53 +22,47 @@ type Election struct {
 	V []*Vote  `json:"votes"`
 }
 
+type Vote struct {
+	C    map[string]int `json:"vote"`
+	Peak *int           `json:"peak,omitempty"`
+}
+
 func Setup() { //Requires flag.parse to have been called
 	if *fix {
 		R = rand.New(rand.NewSource(99))
 	}
 
-	if *random {
-		*Votes = max(R.Intn(*Votes), 3)           //minimum of 3 votes
-		*Candidates = max(R.Intn(*Candidates), 3) //minimum of 3 candidates
-	}
 }
 
-//cmp returns -1 if a beats b, 1 if b beats a and 0 if a tie
+//cmp returns <0 if a beats b, >0 if b beats a and 0 if a tie
 func (e *Election) cmp(a, b int) int {
-	acnt := 0
-	bcnt := 0
+	cnt := 0
 
 	for _, v := range e.V {
 		for i := 0; i < len(v.C); i++ {
 			x := v.C[strconv.Itoa(i)]
 			if x == a {
-				acnt++
+				cnt--
 				break
 			}
 			if x == b {
-				bcnt++
+				cnt++
 				break
 			}
 		}
 	}
-	if acnt == bcnt {
-		return 0
-	}
-	if acnt > bcnt {
-		return -1
-	}
-	return 1
+	return cnt
 }
 
 //Rank returns int array of how many individual wins each candidate has
 func (e *Election) Rank() []int {
-	res := make([]int, len(e.V))
-	for i := 0; i < len(e.V); i++ {
-		for j := i + 1; j < len(e.V); j++ {
+	res := make([]int, e.N)
+	for i := 0; i < e.N; i++ {
+		for j := i + 1; j < e.N; j++ {
 			r := e.cmp(i, j)
-			if r == -1 {
+			if r < 0 {
 				res[i]++
-			} else if r == 1 {
+			} else if r > 0 {
 				res[j]++
 			}
 		}
@@ -90,7 +71,7 @@ func (e *Election) Rank() []int {
 }
 
 //Condorcet returns the condorcet winner as an int. -1 is returned if no winner is found
-func (e *Election) Condorcet() int {
+func (e *Election) Condorcet() (int, []int) {
 	max := 0
 	imax := 0
 	res := e.Rank()
@@ -105,42 +86,13 @@ func (e *Election) Condorcet() int {
 	for _, v := range res {
 		if v == max {
 			if f {
-				return -1
+				return -1, []int{}
 			}
 			f = true
 		}
 	}
 
-	return imax
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func RemoveAt(i int, l []int) []int {
-	return append(l[:i], l[i+1:]...)
-}
-
-func RemoveValue(v int, l []int) []int {
-	for i := 0; i < len(l); i++ {
-		if v == l[i] {
-			return RemoveAt(i, l)
-		}
-	}
-	panic("No value")
-}
-
-func Index(v int, l []int) int {
-	for i := 0; i < len(l); i++ {
-		if v == l[i] {
-			return i
-		}
-	}
-	return -1
+	return imax, res
 }
 
 func (v *Vote) Contains(k string) bool {
@@ -157,23 +109,10 @@ func (v *Vote) Rank(k int) string {
 	panic("Not found")
 }
 
-func Strn(n int) string {
-	return strconv.Itoa(R.Intn(n))
-}
-
-func Contains(v int, l []int) bool {
-	for i := 0; i < len(l); i++ {
-		if v == l[i] {
-			return true
-		}
-	}
-	return false
-}
-
-func New() *Election {
+func New(v, c int) *Election {
 	return &Election{
-		V: make([]*Vote, *Votes),
-		N: *Candidates,
+		V: make([]*Vote, v),
+		N: c,
 	}
 }
 

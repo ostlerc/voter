@@ -1,0 +1,2 @@
+dot -Tps sample.dot > sample.ps
+ps2pdf sample.ps
