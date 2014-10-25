@@ -72,6 +72,12 @@ func Fix(e *election.Election) {
 }
 
 func main() {
+	if *Candidates < 2 {
+		log.Fatal("Invalid number of candidates, must be >1")
+	}
+	if *Votes < 2 {
+		log.Fatal("Invalid number of votes, must be >1 ")
+	}
 	stat, err := os.Stdin.Stat()
 	if err != nil {
 		log.Fatal(err)
