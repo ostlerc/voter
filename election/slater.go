@@ -4,8 +4,8 @@ type TallySlater struct{}
 type TallyKemeny struct{}
 
 func init() {
-	RegisterTally("slater", &TallySlater{})
-	RegisterTally("kemeny", &TallyKemeny{})
+	RegisterTally(&TallySlater{})
+	RegisterTally(&TallyKemeny{})
 }
 
 func (*TallySlater) Tally(e *Election) []int {
@@ -13,9 +13,17 @@ func (*TallySlater) Tally(e *Election) []int {
 	return s
 }
 
+func (*TallySlater) Key() string {
+	return "slater"
+}
+
 func (*TallyKemeny) Tally(e *Election) []int {
 	_, k := e.Graph().Slater()
 	return k
+}
+
+func (*TallyKemeny) Key() string {
+	return "kemeny"
 }
 
 func (e *Egraph) Slater() ([]int, []int) {

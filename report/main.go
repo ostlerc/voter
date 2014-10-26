@@ -12,14 +12,25 @@ import (
 )
 
 var (
-	t = flag.String("type", "dot", "Default type. Options: [json, dot]")
+	o = flag.String("o", "dot", "report output type. [json,dot]")
 )
 
 func main() {
 	flag.Parse()
+	election.Setup()
 
-	if *t != "dot" && *t != "json" {
-		log.Fatal("invalid type", *t)
+	if *o != "dot" && *o != "json" {
+		log.Fatal("invalid type", *o)
+	}
+
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+	hasStdin := (stat.Mode() & os.ModeCharDevice) == 0
+
+	if !hasStdin {
+		log.Fatal("No stdin to read")
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -33,9 +44,9 @@ func main() {
 		log.Fatal(err)
 	}
 	edges := e.Graph().Edges()
-	if *t == "dot" {
+	if *o == "dot" {
 		fmt.Println(edges.Dot())
-	} else if *t == "json" {
+	} else if *o == "json" {
 		fmt.Println(edges.JSON())
 	}
 }

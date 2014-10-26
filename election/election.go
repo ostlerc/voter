@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	fix = flag.Bool("fix", false, "Use fixed random seed")
-
-	R = rand.New(rand.NewSource(time.Now().Unix()))
+	fix      = flag.Bool("fix", false, "Use fixed random seed")
+	R        = rand.New(rand.NewSource(time.Now().Unix()))
+	talliers = make(map[string]Tallier)
 )
 
 type Election struct {
@@ -20,7 +20,7 @@ type Election struct {
 	P *bool             `json:"peak,omitempty"`
 	C *int              `json:"condorcet,omitempty"`
 	R []int             `json:"ranks"`
-	M map[string]string `json:"names"`
+	M map[string]string `json:"names,omitempty"`
 	V []*Vote           `json:"votes"`
 }
 
@@ -28,6 +28,27 @@ type Vote struct {
 	C    map[string]int `json:"vote"`
 	W    int            `json:"weight"`
 	Peak *int           `json:"peak,omitempty"`
+}
+
+type Tallier interface {
+	Tally(*Election) []int
+	Key() string
+}
+
+func RegisterTally(t Tallier) {
+	talliers[t.Key()] = t
+}
+
+func GetTally(s string) Tallier {
+	return talliers[s]
+}
+
+func TallyKeys() []string {
+	res := make([]string, 0)
+	for k, _ := range talliers {
+		res = append(res, k)
+	}
+	return res
 }
 
 func Setup() { //Requires flag.parse to have been called
