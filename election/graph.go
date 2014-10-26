@@ -7,6 +7,7 @@ import (
 )
 
 type Egraph struct {
+	// Majority graph: [parent node][child node]edge weight
 	Nodes map[int]map[int]int
 	names map[string]string
 }
@@ -65,12 +66,29 @@ func (e *Egraph) Dot() string {
 	return res + "}"
 }
 
+//the soul purpose of this struct is to allow json marshalling
 type jsonegraph struct {
 	Nodes map[string]node `json:"nodes"`
 }
 
+//the soul purpose of this struct is to allow json marshalling
 type node struct {
 	Edges map[string]int `json:"edges,omitempty"`
+}
+
+func (j *jsonegraph) egraph() *Egraph {
+	res := &Egraph{Nodes: make(map[int]map[int]int)}
+	for a, m := range j.Nodes {
+		ai, _ := strconv.Atoi(a)
+		res.Nodes[ai] = make(map[int]int)
+		for b, w := range m.Edges {
+			if w != 0 {
+				bi, _ := strconv.Atoi(b)
+				res.Nodes[ai][bi] = w
+			}
+		}
+	}
+	return res
 }
 
 func (e *Egraph) JSON() string {
@@ -91,4 +109,53 @@ func (e *Egraph) JSON() string {
 		fmt.Println(err)
 	}
 	return string(v)
+}
+
+//TODO: delete
+//Nodes map[int]map[int]int
+func (e *Egraph) Slater() ([]int, []int) {
+	var minE, minW int
+	var minEdges []int
+	var minWeights []int
+	for i, p := range Perms(len(e.Nodes)) {
+		d, w := e.slater(p)
+		if i == 0 {
+			minEdges = p
+			minWeights = p
+			minE, minW = d, w
+			continue
+		}
+		if d < minE {
+			minEdges = p
+			minE = d
+		}
+		if w < minW {
+			minWeights = p
+			minW = w
+		}
+
+		if minE == 0 && minW == 0 { //can't get better than that
+			break
+		}
+	}
+
+	return minEdges, minWeights
+}
+
+//Returns slater value (disagreeing edges, disagreement weights) of given permutation
+func (e *Egraph) slater(p []int) (int, int) {
+	edges := 0
+	weights := 0
+
+	for i := 0; i < len(p); i++ {
+		for j := i + 1; j < len(p); j++ {
+			v := e.Nodes[p[j]][p[i]]
+			if v > 0 {
+				edges++
+				weights += v
+			}
+		}
+	}
+
+	return edges, weights
 }

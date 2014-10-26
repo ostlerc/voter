@@ -48,3 +48,33 @@ func Index(v int, l []int) int {
 	}
 	return -1
 }
+
+func allPermutations(l []int) [][]int {
+	if len(l) == 1 {
+		return [][]int{l}
+	}
+
+	res := make([][]int, 0)
+	for i := 0; i < len(l); i++ {
+		next := make([]int, len(l))            //allocate new memory
+		copy(next, l)                          //copy l
+		next = append(next[:i], next[i+1:]...) //remove ith element
+		perms := allPermutations(next)
+		for j, p := range perms {
+			perms[j] = append([]int{l[i]}, p...)
+		}
+		res = append(res, perms...)
+	}
+	return res
+}
+
+// Perms returns all permutations for a number of candidates
+// This is mostly just a wrapper around the allPermutations internal function
+func Perms(n int) [][]int {
+	set := make([]int, n)
+	for i := 0; i < n; i++ {
+		set[i] = i
+	}
+
+	return allPermutations(set)
+}
