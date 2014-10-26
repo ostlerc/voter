@@ -6,10 +6,26 @@ import (
 	"strconv"
 )
 
+var (
+	talliers = make(map[string]Tallier)
+)
+
 type Egraph struct {
 	// Majority graph: [parent node][child node]edge weight
 	Nodes map[int]map[int]int
 	names map[string]string
+}
+
+type Tallier interface {
+	Tally(*Election) []int
+}
+
+func RegisterTally(s string, t Tallier) {
+	talliers[s] = t
+}
+
+func GetTally(s string) Tallier {
+	return talliers[s]
 }
 
 func (e *Election) Graph() *Egraph {

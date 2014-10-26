@@ -36,6 +36,36 @@ func Setup() { //Requires flag.parse to have been called
 	}
 }
 
+// Returns a score of how similar the votes are. 0 is exact match
+func (v *Vote) Score(r []int) int {
+	h := make(map[int]int) //map candidates to index
+	for k, v := range v.C {
+		ki, err := strconv.Atoi(k)
+		if err != nil {
+			panic(err)
+		}
+		h[v] = ki
+	}
+
+	res := 0
+	for i := 0; i < len(r); i++ {
+		w := (r[i] - len(r)/2)
+		if w < 0 {
+			w = -w
+			w += len(r) - r[i]
+		} else {
+			w++
+		}
+		rx := (r[i] - h[i]) * w
+		if rx < 0 {
+			res += -rx
+		} else {
+			res += rx
+		}
+	}
+	return res
+}
+
 //cmp returns <0 if a beats b, >0 if b beats a and 0 if a tie
 func (e *Election) cmp(a, b int) int {
 	cnt := 0

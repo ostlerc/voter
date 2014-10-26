@@ -1,5 +1,23 @@
 package election
 
+type TallySlater struct{}
+type TallyKemeny struct{}
+
+func init() {
+	RegisterTally("slater", &TallySlater{})
+	RegisterTally("kemeny", &TallyKemeny{})
+}
+
+func (*TallySlater) Tally(e *Election) []int {
+	s, _ := e.Graph().Slater()
+	return s
+}
+
+func (*TallyKemeny) Tally(e *Election) []int {
+	_, k := e.Graph().Slater()
+	return k
+}
+
 func (e *Egraph) Slater() ([]int, []int) {
 	var minE, minW int
 	var minEdges []int

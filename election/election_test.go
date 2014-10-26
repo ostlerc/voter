@@ -80,3 +80,47 @@ func TestCondorcet(t *testing.T) {
 		t.Fatal("Incorrect condorcet winner", e.Condorcet())
 	}
 }
+
+func TestScore(t *testing.T) {
+	v := &Vote{C: map[string]int{"0": 0, "1": 1, "2": 2}}
+	s := v.Score([]int{0, 1, 2})
+	if s != 0 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{0, 2, 1})
+	if s != 3 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{1, 0, 2})
+	if s != 5 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{1, 2, 0})
+	if s != 11 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{2, 1, 0})
+	if s != 12 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{2, 0, 1})
+	if s != 9 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	v = &Vote{C: map[string]int{"0": 0, "1": 1, "2": 2, "3": 3, "4": 4}}
+	s = v.Score([]int{0, 1, 2, 3, 4})
+	if s != 0 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{4, 3, 2, 1, 0})
+	if s != 54 {
+		t.Fatal("Incorrect Score", s)
+	}
+}
