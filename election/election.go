@@ -125,6 +125,20 @@ func (e *Election) cmp(a, b int) int {
 	return cnt
 }
 
+// Peak returns the peak of an election
+func (e *Election) Peak() int {
+	res := -1
+	for i, v := range e.V {
+		if i == 0 {
+			res = v.PeakValue()
+		}
+		if res != v.PeakValue() {
+			return -1
+		}
+	}
+	return res
+}
+
 //Rank returns int array of how many individual wins each candidate has
 func (e *Election) Rank() []int {
 	res := make([]int, e.N)

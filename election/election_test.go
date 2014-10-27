@@ -194,4 +194,34 @@ func TestPeak(t *testing.T) {
 	if p := v.PeakValue(); p != 2 {
 		t.Fatal("Incorrect peak value", p)
 	}
+
+	e := &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+	if p := e.Peak(); p != 1 {
+		t.Fatal("Invalid election peak", p)
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+	if p := e.Peak(); p != -1 {
+		t.Fatal("Invalid election peak", p)
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 2, "1": 0, "2": 1}, W: 1}},
+		N: 3,
+	}
+	if p := e.Peak(); p != 2 {
+		t.Fatal("Invalid election peak", p)
+	}
 }
