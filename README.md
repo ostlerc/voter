@@ -13,27 +13,27 @@ egen
         -cand=3: Number of candidates in election
         -cond=false: Force condorcet winner
         -fix=false: Use fixed random seed
+        -o="json": output type [json,csv]
         -peak=false: Force generation with peak preference
         -pref=false: Force preference of some candidate
         -rand=false: Use a random vote/cand count
-        -vote=6: Number of voters in election
+        -vote=4: Number of voters in election
+        -weight=5: Maximum weight of a vote
 
     stdout: election json
     {
         "votes":
-            [
-            {
+            [ {
                 "peak": 0,
-                    "vote": {
-                        "0": 0
-                            "1": 2,
-                        "2": 1,
-                    }
+                "vote": {
+                    "0": 0
+                    "1": 2,
+                    "2": 1,
+                }
             },
             {
                 ...
-            },
-            ],
+            }, ],
 
             "peak": true,
             "pref": {
@@ -60,14 +60,14 @@ tally
     {
         "names": {
             "0": "Alex"
-                "1": "Bart",
-                ...
+            "1": "Bart",
+            ...
         },
-            "results": {
-                "slater": [ 0, 3, 4, 1, 5, 2, 6 ],
-                "kemeny": [ 4, 0, 3, 5, 2, 1, 6 ],
-                ...
-            }
+        "results": {
+            "slater": [ 0, 3, 4, 1, 5, 2, 6 ],
+            "kemeny": [ 4, 0, 3, 5, 2, 1, 6 ],
+            ...
+        }
     }
     - sample csv output
         rank,slater,kemeny
@@ -97,19 +97,19 @@ graph
     {
         "nodes": {
             "6": {},
-                "5": {
-                    "edges": {
-                        "6": 18,
-                        "2": 6
-                    }
-                },
-                "4": {
-                    "edges": {
-                        "6": 18,
-                        ...
-                    }
-                },
-                ....
+            "5": {
+                "edges": {
+                    "6": 18,
+                    "2": 6
+                }
+            },
+            "4": {
+                "edges": {
+                    "6": 18,
+                    ...
+                }
+            },
+            ....
         }
     }
 
@@ -130,10 +130,15 @@ egen for more useful flags
 
 In this example we generate a new election with all the default flags and create a dot file majority graph
 
-    cat sample.csv | tally -i csv -o csv | column -s, -t
+    cat sample.csv | tally -i csv -o csv | column -s, -tn
 
 In this example we tally an election from a csv file and output it in csv format. Then pretty display it.
 
     egen | tally | jq .
 
 In this example we generate a random election and tally it into a json result. The result is then pretty printed
+
+    cat sample.csv | egen -cond -o csv | column -s, -tn
+
+This example generates an election from a csv file then forces that election to have a condorcet winner. Then
+output is in csv form and pretty printed to the screen.

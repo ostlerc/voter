@@ -2,6 +2,7 @@ package election
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -118,6 +119,47 @@ func (e *Election) Rank() []int {
 			} else if r > 0 {
 				res[j]++
 			}
+		}
+	}
+	return res
+}
+
+func (e *Election) CSV() string {
+	lines := make(map[int][]int)
+	res := ""
+	res += fmt.Sprint(",")
+	for i, v := range e.V {
+		res += fmt.Sprint(v.W)
+		if i+1 != len(e.V) {
+			res += fmt.Sprint(",")
+		}
+	}
+
+	for i := 0; i < e.N; i++ {
+		lines[i] = make([]int, len(e.V))
+	}
+
+	for i, v := range e.V {
+		for j := 0; j < e.N; j++ {
+			lines[j][i] = v.C[strconv.Itoa(j)] + 1
+		}
+	}
+
+	res += fmt.Sprint("\n")
+	for i := 0; i < e.N; i++ {
+		if len(e.M) > 0 {
+			res += fmt.Sprint(e.M[strconv.Itoa(i)], ",")
+		} else {
+			res += fmt.Sprint(i, ",")
+		}
+		for j := 0; j < len(e.V); j++ {
+			res += fmt.Sprint(lines[i][j])
+			if j+1 != len(e.V) {
+				res += fmt.Sprint(",")
+			}
+		}
+		if i+1 != e.N {
+			res += fmt.Sprint("\n")
 		}
 	}
 	return res

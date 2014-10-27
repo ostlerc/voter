@@ -18,6 +18,7 @@ var (
 	Votes      = flag.Int("vote", 4, "Number of voters in election")
 	Candidates = flag.Int("cand", 3, "Number of candidates in election")
 	random     = flag.Bool("rand", false, "Use a random vote/cand count")
+	o          = flag.String("o", "json", "output type [json,csv]")
 
 	voter = Voter(&RandVoter{})
 )
@@ -46,10 +47,6 @@ func Campaign() *election.Election {
 		}
 	} else if *peak {
 		voter = &PeakVoter{}
-	}
-
-	if *peak {
-		e.P = peak
 	}
 
 	return e
@@ -82,15 +79,18 @@ func main() {
 	if *Votes < 2 {
 		log.Fatal("Invalid number of votes, must be >1 ")
 	}
+
+	if *o != "json" && *o != "csv" {
+		log.Fatal("Invalid output type '", *o, "'")
+	}
 	stat, err := os.Stdin.Stat()
 	if err != nil {
 		log.Fatal(err)
 	}
-	hasStdin := (stat.Mode() & os.ModeCharDevice) == 0
 
-	e := Campaign()
+	var e *election.Election
 
-	if hasStdin { //read in csv and create election from it
+	if stat.Mode()&os.ModeCharDevice == 0 { //read in csv and create election from it
 		e = election.ParseFrom(i, os.Stdin)
 		*Votes = len(e.V)
 		*Candidates = e.N
@@ -98,16 +98,25 @@ func main() {
 			e.F = election.NewPref(*Candidates)
 		}
 	} else {
+		e = Campaign()
 		for i := 0; i < *Votes; i++ {
 			e.V[i] = voter.Vote(*Candidates)
 		}
 	}
 
+	if *peak {
+		e.P = peak
+	}
+
 	Fix(e)
 
-	dat, err := json.Marshal(&e)
-	if err != nil {
-		panic(err)
+	if *o == "json" {
+		dat, err := json.Marshal(&e)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(dat))
+	} else if *o == "csv" {
+		fmt.Println(e.CSV())
 	}
-	fmt.Println(string(dat))
 }
