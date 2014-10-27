@@ -18,7 +18,7 @@ var (
 type Election struct {
 	N int               `json:"candidates"`
 	F *IntPair          `json:"pref,omitempty"`
-	P *bool             `json:"peak,omitempty"`
+	P *int              `json:"peak,omitempty"`
 	C *int              `json:"condorcet,omitempty"`
 	R []int             `json:"ranks"`
 	M map[string]string `json:"names,omitempty"`

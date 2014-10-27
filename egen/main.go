@@ -70,6 +70,10 @@ func Fix(e *election.Election) {
 		e.C = &c
 	}
 
+	p := e.Peak()
+	if p != -1 {
+		e.P = &p
+	}
 }
 
 func main() {
@@ -100,10 +104,6 @@ func main() {
 		for i := 0; i < *Votes; i++ {
 			e.V[i] = voter.Vote(*Candidates)
 		}
-	}
-
-	if *peak {
-		e.P = peak
 	}
 
 	Fix(e)

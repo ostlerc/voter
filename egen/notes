@@ -1,6 +1,5 @@
 TODO:
- - find if all candidates have peak preference and note that in output
- - allow force peak with csv import
+ - allow force peak with csv import (maybe error as this makes little sense) 
 
 MAYBE TODO:
  - create random names
