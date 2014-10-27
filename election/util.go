@@ -78,3 +78,11 @@ func Perms(n int) [][]int {
 
 	return allPermutations(set)
 }
+
+func CSVFlat(l []string) string {
+	res := ""
+	for _, s := range l {
+		res += s + ","
+	}
+	return res[:len(res)-1]
+}

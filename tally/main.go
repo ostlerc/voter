@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -14,17 +13,10 @@ import (
 )
 
 var (
-	t = flag.String("t", csv(election.TallyKeys()), "tally type results")
+	t = flag.String("t", election.CSVFlat(election.TallyKeys()), "tally type results")
 	o = flag.String("o", "json", "output type [json,csv]")
+	i = flag.String("i", "json", "tally input type. ["+election.CSVFlat(election.Parsers())+"]")
 )
-
-func csv(l []string) string {
-	res := ""
-	for _, s := range l {
-		res += s + ","
-	}
-	return res[:len(res)-1]
-}
 
 type TallyResult struct {
 	Results map[string][]int  `json:"results"`
@@ -55,16 +47,7 @@ func main() {
 		log.Fatal("No stdin to read. Expecting json election as stdin.")
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	dat, err := reader.ReadBytes('\n')
-	if err != nil { //assume we don't generate elections outside of buffer range
-		log.Fatal(err)
-	}
-	e := &election.Election{}
-	err = json.Unmarshal(dat, e)
-	if err != nil {
-		log.Fatal(err)
-	}
+	e := election.ParseFrom(*i, os.Stdin)
 
 	m := make(map[string][]int)
 	for _, t := range talliers {
@@ -72,7 +55,7 @@ func main() {
 	}
 
 	if *o == "json" {
-		dat, err = json.Marshal(&TallyResult{Results: m, Names: e.M})
+		dat, err := json.Marshal(&TallyResult{Results: m, Names: e.M})
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -22,6 +22,10 @@ var (
 	voter = Voter(&RandVoter{})
 )
 
+const (
+	i = "csv" //only type so hard coded not a flag for now
+)
+
 func init() {
 	flag.Parse()
 	election.Setup()
@@ -87,7 +91,8 @@ func main() {
 	e := Campaign()
 
 	if hasStdin { //read in csv and create election from it
-		*Votes = election.CSVElection(e, os.Stdin)
+		e = election.ParseFrom(i, os.Stdin)
+		*Votes = len(e.V)
 		*Candidates = e.N
 		if *pref {
 			e.F = election.NewPref(*Candidates)
