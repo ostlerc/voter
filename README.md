@@ -126,13 +126,13 @@ In this example we generate a json election with 5 candidates (seats) and 20 vot
 Note that each 'vote' is actually a weighted vote with default weights ranging from 1-5. See help on
 egen for more useful flags
 
-    egen | report | dot -Tpng | feh -
+    egen | graph | dot -Tpng | feh -
 
 In this example we generate a new election with all the default flags and create a dot file majority graph
 
     cat sample.csv | tally -i csv -o csv | column -s, -tn
 
-In this example we tally an election from a csv file and output it in csv format. Then pretty display it.
+In this example we tally an election from a csv file and output it in csv format. Then pretty print it.
 
     egen | tally | jq .
 
@@ -140,5 +140,5 @@ In this example we generate a random election and tally it into a json result. T
 
     cat sample.csv | egen -cond -o csv | column -s, -tn
 
-This example generates an election from a csv file then forces that election to have a condorcet winner. Then
-output is in csv form and pretty printed to the screen.
+This example generates an election from a csv file then forces that election to have a condorcet winner.
+Output is in csv form and pretty printed to the screen.
