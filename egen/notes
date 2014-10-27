@@ -1,4 +1,5 @@
 TODO:
  - find preference and add it to generation result
- - find peak and add it to generation result
+ - find if all candidates have peak preference and note that in output
  - allow force peak with csv import
+ - add output option for csv

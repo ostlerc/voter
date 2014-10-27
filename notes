@@ -1,7 +1,7 @@
 binaries -
 
 egen - randomly generate an election
-    stdin = <none>
+    stdin = optional csv with input (will not generate)
 
     flags
     -cand=3: Number of candidates in election
@@ -41,23 +41,69 @@ egen - randomly generate an election
 
 tally - tallies election results
     flags
-    - type = [string: slater, kemeny, bucklin, second order copeland, STV, borda, all] default: all. Election types to tally
+    - o = [string: slater, kemeny, bucklin, second order copeland, STV, borda, all] default: all. Election tally types
     slater = minimum lines swapped
     kemeny = minimum weight swapped
 
-    - output
+    - sample json output
     {
-        "slater": ["4", "2", "3", "1"], //order is implicit - "4" is rank 1, "2" is rank 2, ...
-        "kemeny": ["4", "2", "3", "1"],
-        "condorcet": "4",
-        ...
+        "names": {
+            "0": "Alex"
+            "1": "Bart",
+            "2": "Cindy",
+            "3": "David",
+            "4": "Erik",
+            "5": "Frank",
+            "6": "Greg",
+        },
+        "results": {
+            "slater": [ 0, 3, 4, 1, 5, 2, 6 ],
+            "kemeny": [ 4, 0, 3, 5, 2, 1, 6 ]
+        }
     }
+    - sample csv output
+        rank,slater,kemeny
+        1,Alex,Erik
+        2,David,Alex
+        3,Erik,David
+        4,Bart,Frank
+        5,Frank,Cindy
+        6,Cindy,Bart
+        7,Greg,Greg
 
-report - pretty print election results
+graph - majority graph of election
     stdin = newline separated election results (json)
 
     flags
-    - type = [string] (csv, viz, table)
+    - o = [string] (json, dot)
+
+    - sample dot output
+        digraph G {
+            Alex -> Greg [label="12"];
+            Alex -> Bart [label="6"];
+            Alex -> Cindy [label="6"];
+            ...
+        }
+
+    - sample json output
+    {
+        "nodes": {
+            "6": {},
+            "5": {
+                "edges": {
+                    "6": 18,
+                    "2": 6
+                }
+            },
+            "4": {
+                "edges": {
+                    "6": 18,
+                    ...
+                }
+            },
+            ....
+        }
+    }
 
 possible binaries for part II
     -compare results

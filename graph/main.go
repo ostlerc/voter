@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	o = flag.String("o", "dot", "report output type. [json,dot]")
+	o = flag.String("o", "dot", "graph output type. [json,dot]")
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	election.Setup()
 
 	if *o != "dot" && *o != "json" {
-		log.Fatal("invalid type", *o)
+		log.Fatal("invalid type ", *o)
 	}
 
 	stat, err := os.Stdin.Stat()
