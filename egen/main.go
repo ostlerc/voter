@@ -87,7 +87,11 @@ func main() {
 	e := Campaign()
 
 	if hasStdin { //read in csv and create election from it
-		csvElection(e, os.Stdin)
+		*Votes = election.CSVElection(e, os.Stdin)
+		*Candidates = e.N
+		if *pref {
+			e.F = election.NewPref(*Candidates)
+		}
 	} else {
 		for i := 0; i < *Votes; i++ {
 			e.V[i] = voter.Vote(*Candidates)

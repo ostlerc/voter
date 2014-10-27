@@ -1,11 +1,7 @@
 package main
 
 import (
-	"io"
-	"io/ioutil"
-	"log"
 	"strconv"
-	"strings"
 
 	"github.com/ostlerc/voter/election"
 )
@@ -103,55 +99,4 @@ func (p *PreferVoter) Vote(n int) *election.Vote {
 		res.C[bidx] = p.f.First
 	}
 	return res
-}
-
-func csvElection(e *election.Election, r io.Reader) {
-	dat, err := ioutil.ReadAll(r)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	file := strings.Split(string(dat), "\n")
-
-	*Candidates = len(file) - 1
-	*Votes = 0
-	e.V = make([]*election.Vote, 0)
-
-	for y, row := range file {
-		csv := strings.Split(row, ",")
-		if len(csv) < 2 {
-			*Candidates--
-			continue
-		}
-		for x, col := range csv {
-			if y == 0 { //handle weights
-				if x == 0 {
-					continue //empty anyways
-				}
-				iw, err := strconv.Atoi(col)
-				if err != nil {
-					log.Fatal(err)
-				}
-				*Votes++
-				e.V = append(e.V, &election.Vote{C: make(map[string]int), W: iw})
-				continue
-			}
-			if x == 0 { //handle name map
-				e.M[strconv.Itoa(y-1)] = col
-				continue
-			}
-
-			icol, err := strconv.Atoi(col)
-			if err != nil {
-				log.Fatal(err)
-			}
-			e.V[x-1].C[strconv.Itoa(y-1)] = icol - 1
-
-		}
-	}
-
-	e.N = *Candidates
-	if *pref {
-		e.F = election.NewPref(*Candidates)
-	}
 }

@@ -2,9 +2,12 @@ package election
 
 import (
 	"flag"
+	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -85,6 +88,56 @@ func (v *Vote) Score(r []int) int {
 		}
 	}
 	return res
+}
+
+func CSVElection(e *Election, r io.Reader) int {
+	dat, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file := strings.Split(string(dat), "\n")
+
+	cand := len(file) - 1
+	vote := 0
+	e.V = make([]*Vote, 0)
+
+	for y, row := range file {
+		csv := strings.Split(row, ",")
+		if len(csv) < 2 {
+			cand--
+			continue
+		}
+		for x, col := range csv {
+			if y == 0 { //handle weights
+				if x == 0 {
+					continue //empty anyways
+				}
+				iw, err := strconv.Atoi(col)
+				if err != nil {
+					log.Fatal(err)
+				}
+				vote++
+				e.V = append(e.V, &Vote{C: make(map[string]int), W: iw})
+				continue
+			}
+			if x == 0 { //handle name map
+				e.M[strconv.Itoa(y-1)] = col
+				continue
+			}
+
+			icol, err := strconv.Atoi(col)
+			if err != nil {
+				log.Fatal(err)
+			}
+			e.V[x-1].C[strconv.Itoa(y-1)] = icol - 1
+
+		}
+	}
+
+	e.N = cand
+
+	return vote
 }
 
 //cmp returns <0 if a beats b, >0 if b beats a and 0 if a tie
