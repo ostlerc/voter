@@ -88,6 +88,23 @@ func (v *Vote) Score(r []int) int {
 	return res
 }
 
+func (v *Vote) PeakValue() int {
+	a := v.C["0"] - 1
+	b := v.C["0"] + 1
+	for i := 1; i < len(v.C); i++ {
+		is := strconv.Itoa(i)
+		val := v.C[is]
+		if (a != -1 && a != val) && (b != len(v.C) && b != val) {
+			return -1
+		} else if a == val {
+			a--
+		} else {
+			b++
+		}
+	}
+	return v.C["0"]
+}
+
 //cmp returns <0 if a beats b, >0 if b beats a and 0 if a tie
 func (e *Election) cmp(a, b int) int {
 	cnt := 0

@@ -168,3 +168,30 @@ func TestPref(t *testing.T) {
 		t.Fatal("Invalid Preference ", p)
 	}
 }
+
+func TestPeak(t *testing.T) {
+	v := &Vote{C: map[string]int{"0": 0, "1": 1, "2": 2, "3": 3}}
+	if p := v.PeakValue(); p != 0 {
+		t.Fatal("Incorrect peak value", p)
+	}
+
+	v = &Vote{C: map[string]int{"0": 1, "1": 0, "2": 2, "3": 3}}
+	if p := v.PeakValue(); p != 1 {
+		t.Fatal("Incorrect peak value", p)
+	}
+
+	v = &Vote{C: map[string]int{"0": 2, "1": 0, "2": 1, "3": 3}}
+	if p := v.PeakValue(); p != -1 {
+		t.Fatal("Incorrect peak value", p)
+	}
+
+	v = &Vote{C: map[string]int{"0": 2, "1": 1, "2": 0, "3": 3}}
+	if p := v.PeakValue(); p != 2 {
+		t.Fatal("Incorrect peak value", p)
+	}
+
+	v = &Vote{C: map[string]int{"0": 2, "1": 1, "2": 3, "3": 0}}
+	if p := v.PeakValue(); p != 2 {
+		t.Fatal("Incorrect peak value", p)
+	}
+}
