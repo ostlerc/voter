@@ -53,7 +53,7 @@ func Campaign() *election.Election {
 }
 
 func Fix(e *election.Election) {
-	if *pref {
+	if *pref && e.F == nil {
 		for _, v := range e.V {
 			v.Prefer(e.F)
 		}
@@ -94,9 +94,7 @@ func main() {
 		e = election.ParseFrom(i, os.Stdin)
 		*Votes = len(e.V)
 		*Candidates = e.N
-		if *pref {
-			e.F = election.NewPref(*Candidates)
-		}
+		e.F = e.Pref()
 	} else {
 		e = Campaign()
 		for i := 0; i < *Votes; i++ {

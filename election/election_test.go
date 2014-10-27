@@ -144,3 +144,27 @@ func TestCSV(t *testing.T) {
 		t.Fatal("Invalid csv conversion\n'", e.CSV(), "'\n'", csvelection, "'")
 	}
 }
+
+func TestPref(t *testing.T) {
+	e := &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+	p := e.Pref()
+	if p.First != 1 || p.Second != 0 {
+		t.Fatal("Invalid Preference ", p)
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 2, "1": 0, "2": 1}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+	p = e.Pref()
+	if p.First != 2 || p.Second != 0 {
+		t.Fatal("Invalid Preference ", p)
+	}
+}

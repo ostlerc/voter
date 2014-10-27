@@ -124,6 +124,25 @@ func (e *Election) Rank() []int {
 	return res
 }
 
+func (e *Election) Pref() *IntPair {
+	c := 0
+	for _, v := range e.V {
+		c += v.W
+	}
+	for i := 0; i < e.N; i++ {
+		for j := i + 1; j < e.N; j++ {
+			r := e.cmp(i, j)
+			if r == c {
+				return &IntPair{First: j, Second: i}
+			} else if r == -c {
+				return &IntPair{First: i, Second: j}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (e *Election) CSV() string {
 	lines := make(map[int][]int)
 	res := ""
