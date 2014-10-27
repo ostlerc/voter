@@ -13,6 +13,7 @@ import (
 
 var (
 	o = flag.String("o", "dot", "graph output type. [json,dot]")
+	i = flag.String("i", "json", "graph input type. [json,csv]")
 )
 
 func main() {
@@ -33,15 +34,21 @@ func main() {
 		log.Fatal("No stdin to read")
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	dat, err := reader.ReadBytes('\n')
-	if err != nil { //assume we don't generate elections outside of buffer range
-		log.Fatal(err)
-	}
-	e := &election.Election{}
-	err = json.Unmarshal(dat, e)
-	if err != nil {
-		log.Fatal(err)
+	e := election.New(0, 0)
+	if *i == "json" {
+		reader := bufio.NewReader(os.Stdin)
+		dat, err := reader.ReadBytes('\n')
+		if err != nil { //assume we don't generate elections outside of buffer range
+			log.Fatal(err)
+		}
+		err = json.Unmarshal(dat, e)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else if *i == "csv" {
+		election.CSVElection(e, os.Stdin)
+	} else {
+		log.Fatal("Incorrect input type '", *i, "'")
 	}
 	edges := e.Graph().Edges()
 	if *o == "dot" {
