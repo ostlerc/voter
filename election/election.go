@@ -258,6 +258,16 @@ func (e *Election) Condorcet() int {
 	return imax
 }
 
+func (e *Election) Plurality() []int {
+	score := make([]int, e.N)
+	for _, v := range e.V {
+		for j := 0; j < len(v.C); j++ {
+			score[v.C[strconv.Itoa(j)]] += len(v.C) - j
+		}
+	}
+	return score
+}
+
 func (v *Vote) Contains(k string) bool {
 	_, ok := v.C[k]
 	return ok

@@ -11,6 +11,18 @@ func Strn(n int) string {
 	return strconv.Itoa(R.Intn(n))
 }
 
+func ArEq(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func Contains(v int, l []int) bool {
 	for i := 0; i < len(l); i++ {
 		if v == l[i] {
