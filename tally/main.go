@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -62,23 +63,25 @@ func main() {
 		fmt.Println(string(dat))
 	} else {
 		fmt.Print("rank,")
-		for i := 0; i < len(talliers); i++ {
-			fmt.Print(talliers[i].Key())
+		keys := make(sort.StringSlice, 0) //making this list guarantees ordering. Range on map has no guaranteed order
+		for k, _ := range m {
+			keys = append(keys, k)
+		}
+		sort.Sort(keys)
+		for i := 0; i < len(keys); i++ {
+			fmt.Print(keys[i])
 			if i+1 != len(talliers) {
 				fmt.Print(",")
 			}
 		}
 		fmt.Println("")
 		end := len(m[talliers[0].Key()])
-		keys := make([]string, 0) //making this list guarantees ordering. Range on map has no guaranteed order
-		for k, _ := range m {
-			keys = append(keys, k)
-		}
 		for i := 0; i < end; i++ {
-			for count, k := range keys {
-				if count == 0 {
+			for j := 0; j < len(keys); j++ {
+				if j == 0 {
 					fmt.Print(i+1, ",")
 				}
+				k := keys[j]
 				if len(e.M) > 0 {
 					name := e.M[strconv.Itoa(m[k][i])]
 					if name == "" {
@@ -89,7 +92,7 @@ func main() {
 				} else {
 					fmt.Print(m[k][i])
 				}
-				if count+1 != len(m) {
+				if j+1 != len(m) {
 					fmt.Print(",")
 				}
 			}

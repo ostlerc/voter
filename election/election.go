@@ -127,6 +127,22 @@ func (e *Election) cmp(a, b int) int {
 	return cnt
 }
 
+// wins returns list of candidates that 'a' beats in a 1-1
+func (e *Election) wins(a int) []int {
+	res := make([]int, 0)
+
+	for i := 0; i < e.N; i++ {
+		if i == a {
+			continue
+		}
+		if e.cmp(a, i) < 0 {
+			res = append(res, i)
+		}
+	}
+
+	return res
+}
+
 // Peak returns the peak of an election
 func (e *Election) Peak() int {
 	res := -1
