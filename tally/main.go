@@ -80,7 +80,12 @@ func main() {
 					fmt.Print(i+1, ",")
 				}
 				if len(e.M) > 0 {
-					fmt.Print(e.M[strconv.Itoa(m[k][i])])
+					name := e.M[strconv.Itoa(m[k][i])]
+					if name == "" {
+						fmt.Print(m[k][i])
+					} else {
+						fmt.Print(name)
+					}
 				} else {
 					fmt.Print(m[k][i])
 				}
