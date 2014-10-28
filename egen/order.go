@@ -24,9 +24,9 @@ func (*RandVoter) Vote(n int) *election.Vote {
 
 func (*PeakVoter) Vote(n int) *election.Vote {
 	p := election.R.Intn(n)
-	e := peakvote(p, n)
-	e.Peak = &p
-	return e
+	v := peakvote(p, n)
+	v.Peak = &p
+	return v
 }
 
 func vote(n int) *election.Vote {

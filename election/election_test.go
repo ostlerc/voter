@@ -167,6 +167,17 @@ func TestPref(t *testing.T) {
 	if p.First != 2 || p.Second != 0 {
 		t.Fatal("Invalid Preference ", p)
 	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+	p = e.Pref()
+	if p != nil {
+		t.Fatal("Invalid Preference ", p)
+	}
 }
 
 func TestPeak(t *testing.T) {
@@ -221,7 +232,7 @@ func TestPeak(t *testing.T) {
 		&Vote{C: map[string]int{"0": 2, "1": 0, "2": 1}, W: 1}},
 		N: 3,
 	}
-	if p := e.Peak(); p != 2 {
+	if p := e.Peak(); p != -1 {
 		t.Fatal("Invalid election peak", p)
 	}
 }

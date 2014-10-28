@@ -94,15 +94,17 @@ func (v *Vote) PeakValue() int {
 	for i := 1; i < len(v.C); i++ {
 		is := strconv.Itoa(i)
 		val := v.C[is]
-		if (a != -1 && a != val) && (b != len(v.C) && b != val) {
-			return -1
-		} else if a == val {
+		if a == val {
 			a--
-		} else {
+		} else if b == val {
 			b++
+		} else {
+			return -1
 		}
 	}
-	return v.C["0"]
+	p := v.C["0"]
+	v.Peak = &p
+	return p
 }
 
 //cmp returns <0 if a beats b, >0 if b beats a and 0 if a tie

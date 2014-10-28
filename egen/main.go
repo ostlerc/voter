@@ -66,6 +66,8 @@ func Fix(e *election.Election) {
 		c = e.Condorcet()
 	}
 
+	e.F = e.Pref()
+
 	if c != -1 {
 		e.C = &c
 	}
@@ -92,15 +94,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var e *election.Election
+	e := Campaign()
 
 	if stat.Mode()&os.ModeCharDevice == 0 { //read in csv and create election from it
+		if *peak {
+			log.Fatal("Incorrect usage - cannot force peak with given data set, randomly create an election with force peak instead")
+		}
 		e = election.ParseFrom(i, os.Stdin)
 		*Votes = len(e.V)
 		*Candidates = e.N
 		e.F = e.Pref()
 	} else {
-		e = Campaign()
 		for i := 0; i < *Votes; i++ {
 			e.V[i] = voter.Vote(*Candidates)
 		}
