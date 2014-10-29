@@ -1,6 +1,7 @@
 package election
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 )
@@ -235,4 +236,19 @@ func TestPeak(t *testing.T) {
 	if p := e.Peak(); p != -1 {
 		t.Fatal("Invalid election peak", p)
 	}
+}
+
+func TestManipulation(t *testing.T) {
+	e := &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+	m := e.FindManipulation(GetTally("stv"))
+	dat, err := json.Marshal(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Fatal(string(dat))
 }

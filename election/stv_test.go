@@ -23,7 +23,7 @@ func TestSTV(t *testing.T) {
 	}
 
 	v = e.STV()
-	if !ArEq(v, []int{2, 1, 0}) {
+	if !ArEq(v, []int{1, 0, 2}) {
 		t.Fatal("Invalid stv result", v)
 	}
 }

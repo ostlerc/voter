@@ -268,6 +268,63 @@ func (e *Election) Plurality() []int {
 	return score
 }
 
+type Manipulation struct {
+	VoteIndex int    `json:"vote_index"`
+	OrigVote  *Vote  `json:"orig_vote"`
+	NewVote   *Vote  `json:"new_vote"`
+	OrigScore int    `json:"orig_score"`
+	NewScore  int    `json:"new_score"`
+	OrigTally []int  `json:"orig_tally"`
+	NewTally  []int  `json:"new_tally"`
+	TallyType string `json:"type"`
+}
+
+// FindManipulation returns an available manipulation if one is found. The first manipulation found is returned
+func (e *Election) FindManipulation(t Tallier) *Manipulation {
+	perms := Perms(e.N)
+	origTally := t.Tally(e)
+	for i, v := range e.V {
+		origVote := make(map[string]int)
+		for k, x := range v.C {
+			origVote[k] = x
+		}
+		origScore := v.Score(origTally)
+		for _, p := range perms {
+			for j := 0; j < e.N; j++ {
+				v.C[strconv.Itoa(j)] = p[j]
+			}
+			newTally := t.Tally(e)
+			newVotes := make(map[string]int)
+			for k, x := range v.C {
+				newVotes[k] = x
+			}
+			for k, x := range origVote {
+				v.C[k] = x
+			}
+			newScore := v.Score(newTally)
+
+			if newScore < origScore {
+				return &Manipulation{
+					VoteIndex: i,
+					OrigVote:  v,
+					OrigTally: origTally,
+					NewTally:  newTally,
+					NewVote: &Vote{
+						C:    newVotes,
+						W:    v.W,
+						Peak: v.Peak,
+					},
+					OrigScore: origScore,
+					NewScore:  newScore,
+					TallyType: t.Key(),
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (v *Vote) Contains(k string) bool {
 	_, ok := v.C[k]
 	return ok

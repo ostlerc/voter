@@ -28,7 +28,7 @@ func (e *Election) STV() []int {
 			if Contains(j, ignore) {
 				continue
 			}
-			if min == -1 || score[j] < min {
+			if min == -1 || score[j] <= min {
 				min = score[j]
 				mini = j
 			}

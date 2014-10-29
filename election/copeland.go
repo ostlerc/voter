@@ -63,7 +63,7 @@ func (e *Election) Copeland() []int {
 			max = res[i]
 			idxs2 = []int{i}
 		} else if res[i] == max {
-			idxs2 = append(idxs, i)
+			idxs2 = append(idxs2, i)
 		}
 	}
 	for len(idxs2) != len(e.V[0].C) {
