@@ -17,12 +17,14 @@ var (
 	t = flag.String("t", election.CSVFlat(election.TallyKeys()), "tally type results")
 	o = flag.String("o", "csv", "output type [json,csv]")
 	i = flag.String("i", "json", "tally input type. ["+election.CSVFlat(election.Parsers())+"]")
+	v = flag.Bool("v", false, "verbose json output. Shows election and manipulation values")
 )
 
 type TallyResult struct {
 	Results   map[string][]int         `json:"results"`
 	Names     map[string]string        `json:"names,omitempty"`
 	Condorcet *int                     `json:"condorcet,omitempty"`
+	Election  *election.Election       `json:"election,omitempty"`
 	M         []*election.Manipulation `json:"manipulations,omitempty"`
 }
 
@@ -61,18 +63,23 @@ func main() {
 		c := e.Condorcet()
 
 		manipulations := make([]*election.Manipulation, 0)
-		for _, t := range talliers {
-			m := e.FindManipulation(t)
-			if m != nil {
-				manipulations = append(manipulations, m)
-			}
-		}
-		dat, err := json.Marshal(&TallyResult{
+		res := &TallyResult{
 			Results:   m,
 			Names:     e.M,
 			Condorcet: &c,
-			M:         manipulations,
-		})
+		}
+		if *v {
+			for _, t := range talliers {
+				m := e.FindManipulation(t)
+				if m != nil {
+					manipulations = append(manipulations, m)
+				}
+			}
+			res.M = manipulations
+			res.Election = e
+		}
+
+		dat, err := json.Marshal(res)
 		if err != nil {
 			log.Fatal(err)
 		}
