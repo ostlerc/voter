@@ -71,6 +71,9 @@ func (v *Vote) Score(r []int) int {
 
 	res := 0
 	for i := 0; i < len(r); i++ {
+		if r[i] == -1 {
+			continue
+		}
 		w := (r[i] - len(r)/2)
 		if w < 0 {
 			w = -w
@@ -195,7 +198,7 @@ func (e *Election) Pref() *IntPair {
 func (e *Election) CSV() string {
 	lines := make(map[int][]int)
 	res := ""
-	res += fmt.Sprint(",")
+	res += fmt.Sprint("weight,")
 	for i, v := range e.V {
 		res += fmt.Sprint(v.W)
 		if i+1 != len(e.V) {
@@ -229,6 +232,14 @@ func (e *Election) CSV() string {
 		if i+1 != e.N {
 			res += fmt.Sprint("\n")
 		}
+	}
+	f := e.Pref()
+	if f != nil {
+		res += fmt.Sprintf("\npref,%d,%d", f.First+1, f.Second+1)
+	}
+	c := e.Condorcet()
+	if c != -1 {
+		res += fmt.Sprintf("\ncondorcet,%d\n", c+1)
 	}
 	return res
 }
@@ -323,6 +334,73 @@ func (e *Election) FindManipulation(t Tallier) *Manipulation {
 	}
 
 	return nil
+}
+
+func (e *Election) Copy() *Election {
+	m := make(map[string]string)
+	for k, v := range e.M {
+		m[k] = v
+	}
+	v := make([]*Vote, len(e.V))
+	for i := 0; i < len(e.V); i++ {
+		v[i] = e.V[i]
+	}
+	r := make([]int, len(e.R))
+	for i := 0; i < len(e.R); i++ {
+		r[i] = e.R[i]
+	}
+	return &Election{
+		N: e.N,
+		F: e.F,
+		P: e.P,
+		C: e.C,
+		R: r,
+		M: m,
+		V: v,
+	}
+}
+
+func (v *Vote) Copy() *Vote {
+	c := make(map[string]int)
+	for k, x := range v.C {
+		c[k] = x
+	}
+	return &Vote{
+		C:    c,
+		W:    v.W,
+		Peak: v.Peak,
+	}
+}
+
+func (e *Election) RemoveCandidate(k int) *Election {
+	res := e.Copy()
+	res.N--
+	//TODO: care about pref, peak and condorcet values?
+	res.F = nil
+	res.C = nil
+	res.P = nil
+	if len(res.R) != 0 {
+		res.R = RemoveAt(k, res.R)
+	}
+	for x, v := range res.M {
+		if v == strconv.Itoa(k) {
+			delete(res.M, x)
+		}
+	}
+	for _, v := range res.V {
+		v.RemoveCandidate(k)
+	}
+
+	return res
+}
+
+func (v *Vote) RemoveCandidate(k int) *Vote {
+	res := v.Copy()
+	delete(res.C, strconv.Itoa(k))
+	for i := k + 1; i < len(v.C); i++ {
+		res.C[strconv.Itoa(i-1)] = v.C[strconv.Itoa(i)]
+	}
+	return res
 }
 
 func (v *Vote) Contains(k string) bool {

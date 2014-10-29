@@ -9,14 +9,14 @@ func init() {
 }
 
 func (*TallyBucklin) Tally(e *Election) []int {
-	res := make([]int, len(e.V[0].C))
+	res := make([]int, e.N)
 	for i := 0; i < len(res); i++ {
 		res[i] = -1
 	}
 	for i := 0; i < len(res); i++ {
 		if b := e.Bucklin(i); b != -1 {
 			res[0] = b
-			res[1] = i + 1
+			res[1] = i
 		}
 	}
 	return res
@@ -37,12 +37,9 @@ func (e *Election) Bucklin(k int) int {
 		total += v.W
 	}
 	m := total / 2
-	if total%2 != 0 {
-		m++
-	}
 
-	for i := 0; i < k; i++ {
-		if res[i] >= m {
+	for i := 0; i < e.N; i++ {
+		if res[i] > m {
 			return i
 		}
 	}

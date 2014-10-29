@@ -14,6 +14,10 @@ func (*TallyCopeland) Key() string {
 	return "copeland"
 }
 
+func (*TallyCopeland) Irrelevant(l []int) int {
+	return -1
+}
+
 // Returns Copeland result
 func (e *Election) Copeland() []int {
 	//gather first order scores

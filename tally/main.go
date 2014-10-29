@@ -21,11 +21,12 @@ var (
 )
 
 type TallyResult struct {
-	Results   map[string][]int         `json:"results"`
-	Names     map[string]string        `json:"names,omitempty"`
-	Condorcet *int                     `json:"condorcet,omitempty"`
-	Election  *election.Election       `json:"election,omitempty"`
-	M         []*election.Manipulation `json:"manipulations,omitempty"`
+	Results     map[string][]int                  `json:"results"`
+	Names       map[string]string                 `json:"names,omitempty"`
+	Condorcet   *int                              `json:"condorcet,omitempty"`
+	Election    *election.Election                `json:"election,omitempty"`
+	M           map[string]*election.Manipulation `json:"manipulations,omitempty"`
+	CondoretWon bool                              `json:"condorcet_won"`
 }
 
 func main() {
@@ -59,22 +60,28 @@ func main() {
 		m[t.Key()] = t.Tally(e)
 	}
 
-	if *o == "json" {
-		c := e.Condorcet()
+	manipulations := make(map[string]*election.Manipulation)
 
-		manipulations := make([]*election.Manipulation, 0)
-		res := &TallyResult{
-			Results:   m,
-			Names:     e.M,
-			Condorcet: &c,
-		}
-		if *v {
-			for _, t := range talliers {
-				m := e.FindManipulation(t)
-				if m != nil {
-					manipulations = append(manipulations, m)
-				}
+	if *v {
+		for _, t := range talliers {
+			m := e.FindManipulation(t)
+			if m != nil {
+				manipulations[t.Key()] = m
 			}
+		}
+	}
+
+	if *o == "json" {
+		res := &TallyResult{
+			Results: m,
+			Names:   e.M,
+		}
+
+		if c := e.Condorcet() + 1; c != 0 {
+			res.Condorcet = &c
+		}
+
+		if *v {
 			res.M = manipulations
 			res.Election = e
 		}
@@ -85,12 +92,18 @@ func main() {
 		}
 		fmt.Println(string(dat))
 	} else {
-		fmt.Print("rank,")
+		if *v {
+			fmt.Println(e.CSV())
+			fmt.Println("")
+		}
+
 		keys := make(sort.StringSlice, 0) //making this list guarantees ordering. Range on map has no guaranteed order
 		for k, _ := range m {
 			keys = append(keys, k)
 		}
 		sort.Sort(keys)
+
+		fmt.Print("rank,")
 		for i := 0; i < len(keys); i++ {
 			fmt.Print(keys[i])
 			if i+1 != len(talliers) {
@@ -98,6 +111,29 @@ func main() {
 			}
 		}
 		fmt.Println("")
+
+		if *v {
+			fmt.Print("manipulation,")
+			for i := 0; i < len(keys); i++ {
+				_, ok := manipulations[keys[i]]
+				fmt.Print(ok, ",")
+				if i+1 != len(talliers) {
+					fmt.Print(",")
+				}
+			}
+			fmt.Println("")
+
+			if e.C != nil {
+				fmt.Print("condorcet won,")
+				for i := 0; i < len(keys); i++ {
+					fmt.Print(m[keys[i]][0] == *e.C)
+					if i+1 != len(talliers) {
+						fmt.Print(",")
+					}
+				}
+				fmt.Println("")
+			}
+		}
 		end := len(m[talliers[0].Key()])
 		for i := 0; i < end; i++ {
 			for j := 0; j < len(keys); j++ {
@@ -113,7 +149,11 @@ func main() {
 						fmt.Print(name)
 					}
 				} else {
-					fmt.Print(m[k][i])
+					if m[k][i] == -1 {
+						fmt.Print(m[k][i])
+					} else {
+						fmt.Print(m[k][i] + 1)
+					}
 				}
 				if j+1 != len(m) {
 					fmt.Print(",")
@@ -121,5 +161,27 @@ func main() {
 			}
 			fmt.Println("")
 		}
+
+		if f := e.Pref(); *v && f != nil {
+			continuedPref := true
+
+			for j := 0; j < len(keys) && continuedPref; j++ {
+				for _, v := range m[keys[j]] {
+					if v == f.First {
+						break
+					}
+					if v == f.Second {
+						continuedPref = false
+						break
+					}
+					if keys[j] == "bucklin" {
+						break
+					}
+				}
+			}
+
+			fmt.Printf("pref intact,%v\n", continuedPref)
+		}
+
 	}
 }
