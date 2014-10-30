@@ -114,6 +114,28 @@ graph
         }
     }
 
+poll
+====
+  poll verbose tally outputs to find trends
+
+    stdin = newline separated stream of verbose tally json
+
+    - sample json output
+    {
+        "pref_changed": 25,
+        "manipulations": {
+            "borda": 200,
+            "bucklin": 200,
+            "copeland": 199,
+            "kemeny": 187,
+            "slater": 196,
+            "stv": 200
+        },
+        "irr_cand_affect": 70,
+        "total": 200
+    }
+
+
 Examples
 ========
 
@@ -143,3 +165,8 @@ In this example we generate a random election and tally it into a json result. T
 
 This example generates an election from a csv file then forces that election to have a condorcet winner.
 Output is in csv form and pretty printed to the screen.
+
+    for i in $(seq 1 100); do egen -vote 5 -cand 5 | tally -v -o json >> res.json; done; cat res.json | poll | jq .
+
+In this example we create 100 elections and verbose tally them. The elections are stored in a file called 'res.json'.
+After the elections are created we then pipe them into poll and receive our pretty printed json results

@@ -20,23 +20,7 @@ var (
 	v = flag.Bool("v", false, "verbose output. Show all tally information")
 )
 
-type IrrelevantCand struct {
-	Candidate     string `json:"candidate"`
-	ChangesWinner bool   `json:"causes_change"`
-}
-
-type TallyResult struct {
-	Results     map[string][]int                  `json:"results"`
-	Names       map[string]string                 `json:"names,omitempty"`
-	Condorcet   *int                              `json:"condorcet,omitempty"`
-	Election    *election.Election                `json:"election,omitempty"`
-	M           map[string]*election.Manipulation `json:"manipulations,omitempty"`
-	CondoretWon bool                              `json:"condorcet_won"`
-	PrefIntact  *bool                             `json:"pref_intact,omitempty"`
-	Irrelevant  *IrrelevantCand                   `json:"irr_cand,omitempty"`
-}
-
-func irrelevant(e *election.Election, tallies map[string][]int) *IrrelevantCand {
+func irrelevant(e *election.Election, tallies map[string][]int) *election.IrrelevantCand {
 	found := make(map[int]bool)
 	for _, v := range tallies {
 		found[v[0]] = true //not in a first place, then you are IRRELEVANT!
@@ -64,14 +48,14 @@ func irrelevant(e *election.Election, tallies map[string][]int) *IrrelevantCand 
 		res := t.Tally(e2)
 		if v[0] != res[0] {
 
-			return &IrrelevantCand{
+			return &election.IrrelevantCand{
 				Candidate:     name,
 				ChangesWinner: true,
 			}
 		}
 	}
 
-	return &IrrelevantCand{
+	return &election.IrrelevantCand{
 		Candidate:     name,
 		ChangesWinner: false,
 	}
@@ -150,7 +134,7 @@ func main() {
 	}
 
 	if *o == "json" {
-		res := &TallyResult{
+		res := &election.TallyResult{
 			Results: m,
 			Names:   e.M,
 		}

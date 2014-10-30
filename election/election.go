@@ -31,6 +31,21 @@ type Vote struct {
 	Peak *int           `json:"peak,omitempty"`
 }
 
+type IrrelevantCand struct {
+	Candidate     string `json:"candidate"`
+	ChangesWinner bool   `json:"causes_change"`
+}
+
+type TallyResult struct {
+	Results    map[string][]int         `json:"results"`
+	Names      map[string]string        `json:"names,omitempty"`
+	Condorcet  *int                     `json:"condorcet,omitempty"`
+	Election   *Election                `json:"election,omitempty"`
+	M          map[string]*Manipulation `json:"manipulations,omitempty"`
+	PrefIntact *bool                    `json:"pref_intact,omitempty"`
+	Irrelevant *IrrelevantCand          `json:"irr_cand,omitempty"`
+}
+
 type Tallier interface {
 	Tally(*Election) []int
 	Key() string
