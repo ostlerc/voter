@@ -17,7 +17,7 @@ var (
 	t = flag.String("t", election.CSVFlat(election.TallyKeys()), "tally type results")
 	o = flag.String("o", "csv", "output type [json,csv]")
 	i = flag.String("i", "json", "tally input type. ["+election.CSVFlat(election.Parsers())+"]")
-	v = flag.Bool("v", false, "verbose json output. Shows election and manipulation values")
+	v = flag.Bool("v", false, "verbose output. Show all tally information")
 )
 
 type TallyResult struct {
@@ -27,6 +27,7 @@ type TallyResult struct {
 	Election    *election.Election                `json:"election,omitempty"`
 	M           map[string]*election.Manipulation `json:"manipulations,omitempty"`
 	CondoretWon bool                              `json:"condorcet_won"`
+	PrefIntact  *bool                             `json:"pref_intact,omitempty"`
 }
 
 func main() {
@@ -62,11 +63,39 @@ func main() {
 
 	manipulations := make(map[string]*election.Manipulation)
 
+	prefIntact := true
+	if e.F == nil {
+		e.F = e.Pref()
+	}
+
+	keys := make(sort.StringSlice, 0) //making this list guarantees ordering. Range on map has no guaranteed order
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Sort(keys)
+
 	if *v {
 		for _, t := range talliers {
 			m := e.FindManipulation(t)
 			if m != nil {
 				manipulations[t.Key()] = m
+			}
+		}
+
+		if e.F != nil {
+			for j := 0; j < len(keys) && prefIntact; j++ {
+				for _, v := range m[keys[j]] {
+					if v == e.F.First {
+						break
+					}
+					if v == e.F.Second {
+						prefIntact = false
+						break
+					}
+					if keys[j] == "bucklin" {
+						break
+					}
+				}
 			}
 		}
 	}
@@ -84,6 +113,9 @@ func main() {
 		if *v {
 			res.M = manipulations
 			res.Election = e
+			if e.F != nil {
+				res.PrefIntact = &prefIntact
+			}
 		}
 
 		dat, err := json.Marshal(res)
@@ -96,12 +128,6 @@ func main() {
 			fmt.Println(e.CSV())
 			fmt.Println("")
 		}
-
-		keys := make(sort.StringSlice, 0) //making this list guarantees ordering. Range on map has no guaranteed order
-		for k, _ := range m {
-			keys = append(keys, k)
-		}
-		sort.Sort(keys)
 
 		fmt.Print("rank,")
 		for i := 0; i < len(keys); i++ {
@@ -162,26 +188,8 @@ func main() {
 			fmt.Println("")
 		}
 
-		if f := e.Pref(); *v && f != nil {
-			continuedPref := true
-
-			for j := 0; j < len(keys) && continuedPref; j++ {
-				for _, v := range m[keys[j]] {
-					if v == f.First {
-						break
-					}
-					if v == f.Second {
-						continuedPref = false
-						break
-					}
-					if keys[j] == "bucklin" {
-						break
-					}
-				}
-			}
-
-			fmt.Printf("pref intact,%v\n", continuedPref)
+		if *v && e.F != nil {
+			fmt.Printf("pref intact,%v\n", prefIntact)
 		}
-
 	}
 }

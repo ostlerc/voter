@@ -13,10 +13,11 @@ func (*TallyBucklin) Tally(e *Election) []int {
 	for i := 0; i < len(res); i++ {
 		res[i] = -1
 	}
-	for i := 0; i < len(res); i++ {
+	for i := 1; i < len(res)+1; i++ {
 		if b := e.Bucklin(i); b != -1 {
 			res[0] = b
-			res[1] = i
+			res[1] = i - 1
+			break
 		}
 	}
 	return res

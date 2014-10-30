@@ -127,6 +127,17 @@ func TestScore(t *testing.T) {
 	if s != 54 {
 		t.Fatal("Incorrect Score", s)
 	}
+
+	v = &Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}}
+	s = v.Score([]int{2, 0, 1})
+	if s != 6 {
+		t.Fatal("Incorrect Score", s)
+	}
+
+	s = v.Score([]int{2, 1, 0})
+	if s != 11 {
+		t.Fatal("Incorrect Score", s)
+	}
 }
 
 var csvelection = `,5,4,3,6

@@ -81,7 +81,7 @@ func (v *Vote) Score(r []int) int {
 		} else {
 			w++
 		}
-		rx := (r[i] - h[i]) * w
+		rx := (i - h[r[i]]) * w
 		if rx < 0 {
 			res += -rx
 		} else {
