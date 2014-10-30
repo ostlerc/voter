@@ -45,6 +45,9 @@ func (e *Election) stv(ignore []int) []int {
 		for i := 0; i < len(v.C); i++ {
 			cand := v.C[strconv.Itoa(i)]
 			if !Contains(cand, ignore) {
+				for len(res) <= cand {
+					res = append(res, 0)
+				}
 				res[cand]++
 				break
 			}

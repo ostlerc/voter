@@ -11,7 +11,7 @@ import (
 
 var (
 	fix      = flag.Bool("fix", false, "Use fixed random seed")
-	R        = rand.New(rand.NewSource(time.Now().Unix()))
+	R        = rand.New(rand.NewSource(time.Now().UnixNano()))
 	talliers = make(map[string]Tallier)
 )
 
@@ -273,7 +273,11 @@ func (e *Election) Plurality() []int {
 	score := make([]int, e.N)
 	for _, v := range e.V {
 		for j := 0; j < len(v.C); j++ {
-			score[v.C[strconv.Itoa(j)]] += len(v.C) - j
+			idx := v.C[strconv.Itoa(j)]
+			for len(score) <= idx {
+				score = append(score, 0)
+			}
+			score[idx] += len(v.C) - j
 		}
 	}
 	return score
@@ -385,6 +389,7 @@ func (e *Election) RemoveCandidate(k int) *Election {
 	for x, v := range res.M {
 		if v == strconv.Itoa(k) {
 			delete(res.M, x)
+			break
 		}
 	}
 	for _, v := range res.V {

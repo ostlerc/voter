@@ -20,6 +20,11 @@ var (
 	v = flag.Bool("v", false, "verbose output. Show all tally information")
 )
 
+type IrrelevantCand struct {
+	Candidate     string `json:"candidate"`
+	ChangesWinner bool   `json:"causes_change"`
+}
+
 type TallyResult struct {
 	Results     map[string][]int                  `json:"results"`
 	Names       map[string]string                 `json:"names,omitempty"`
@@ -28,6 +33,48 @@ type TallyResult struct {
 	M           map[string]*election.Manipulation `json:"manipulations,omitempty"`
 	CondoretWon bool                              `json:"condorcet_won"`
 	PrefIntact  *bool                             `json:"pref_intact,omitempty"`
+	Irrelevant  *IrrelevantCand                   `json:"irr_cand,omitempty"`
+}
+
+func irrelevant(e *election.Election, tallies map[string][]int) *IrrelevantCand {
+	found := make(map[int]bool)
+	for _, v := range tallies {
+		found[v[0]] = true //not in a first place, then you are IRRELEVANT!
+	}
+	cand := -1
+	for i := 0; i < e.N; i++ {
+		if _, ok := found[i]; !ok {
+			cand = i
+			break
+		}
+	}
+	if cand == -1 {
+		return nil
+	}
+
+	name := strconv.Itoa(cand)
+
+	if len(e.M) > 0 {
+		name = e.M[name]
+	}
+
+	e2 := e.RemoveCandidate(cand)
+	for k, v := range tallies {
+		t := election.GetTally(k)
+		res := t.Tally(e2)
+		if v[0] != res[0] {
+
+			return &IrrelevantCand{
+				Candidate:     name,
+				ChangesWinner: true,
+			}
+		}
+	}
+
+	return &IrrelevantCand{
+		Candidate:     name,
+		ChangesWinner: false,
+	}
 }
 
 func main() {
@@ -67,6 +114,8 @@ func main() {
 	if e.F == nil {
 		e.F = e.Pref()
 	}
+
+	irrCand := irrelevant(e, m)
 
 	keys := make(sort.StringSlice, 0) //making this list guarantees ordering. Range on map has no guaranteed order
 	for k, _ := range m {
@@ -116,6 +165,7 @@ func main() {
 			if e.F != nil {
 				res.PrefIntact = &prefIntact
 			}
+			res.Irrelevant = irrCand
 		}
 
 		dat, err := json.Marshal(res)
@@ -126,7 +176,6 @@ func main() {
 	} else {
 		if *v {
 			fmt.Println(e.CSV())
-			fmt.Println("")
 		}
 
 		fmt.Print("rank,")
@@ -142,7 +191,7 @@ func main() {
 			fmt.Print("manipulation,")
 			for i := 0; i < len(keys); i++ {
 				_, ok := manipulations[keys[i]]
-				fmt.Print(ok, ",")
+				fmt.Print(ok)
 				if i+1 != len(talliers) {
 					fmt.Print(",")
 				}
@@ -188,8 +237,13 @@ func main() {
 			fmt.Println("")
 		}
 
-		if *v && e.F != nil {
-			fmt.Printf("pref intact,%v\n", prefIntact)
+		if *v {
+			if e.F != nil {
+				fmt.Printf("pref intact,%v\n", prefIntact)
+			}
+			if irrCand != nil {
+				fmt.Printf("irrlvnt alters,%v,%v\n", irrCand.Candidate, irrCand.ChangesWinner)
+			}
 		}
 	}
 }
