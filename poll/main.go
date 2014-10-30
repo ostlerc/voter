@@ -12,10 +12,11 @@ import (
 )
 
 type TallySum struct {
-	PrefChanged int            `json:"pref_changed"`
-	M           map[string]int `json:"manipulations"`
-	Irrelevant  int            `json:"irr_cand_affect"`
-	Total       int            `json:"total"`
+	PrefChanged   int            `json:"pref_changed"`
+	M             map[string]int `json:"manipulations"`
+	Irrelevant    int            `json:"irr_cand_affect"`
+	CondorcetLost int            `json:"condorcet_lost"`
+	Total         int            `json:"total"`
 }
 
 func main() {
@@ -47,6 +48,15 @@ func main() {
 
 		if res.Irrelevant != nil && res.Irrelevant.ChangesWinner {
 			sum.Irrelevant++
+		}
+
+		if res.Condorcet != nil {
+			for _, v := range res.Results {
+				if v[0]+1 != *res.Condorcet && v[0] != -1 {
+					sum.CondorcetLost++
+					break
+				}
+			}
 		}
 
 		sum.Total++
