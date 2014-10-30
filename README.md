@@ -52,9 +52,10 @@ tally
     stdin = election [csv,json]
 
     flags
-        -i="json": tally input type. [json,csv]
-        -o="json": output type [json,csv]
-        -t="slater,kemeny": tally type results
+      -i="json": tally input type. [json,csv]
+      -o="csv": output type [json,csv]
+      -t="borda,bucklin,copeland,slater,kemeny,stv": tally type results
+      -v=false: verbose output. Show all tally information
 
     - sample json output
     {
@@ -130,11 +131,11 @@ egen for more useful flags
 
 In this example we generate a new election with all the default flags and create a dot file majority graph
 
-    cat sample.csv | tally -i csv -o csv | column -s, -tn
+    cat sample.csv | tally -i csv | column -s, -tn
 
 In this example we tally an election from a csv file and output it in csv format. Then pretty print it.
 
-    egen | tally | jq .
+    egen | tally -o json | jq .
 
 In this example we generate a random election and tally it into a json result. The result is then pretty printed
 

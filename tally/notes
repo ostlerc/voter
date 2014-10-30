@@ -1,4 +1,1 @@
-cat sample.csv | egen | tally -o csv | column -s, -t
-
-TODO:
-    add option to check for possible manipulations
+cat sample.csv | egen | tally | column -s, -t

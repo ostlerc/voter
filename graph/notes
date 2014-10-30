@@ -1,2 +1,3 @@
 dot -Tps sample.dot > sample.ps
+dot -Tpng | feh -
 ps2pdf sample.ps
