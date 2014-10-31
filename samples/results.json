@@ -1,140 +1,365 @@
 cond_dumb.json
 {
   "total": 100,
-  "condorcet_lost": 53,
-  "irr_cand_affect": 47,
-  "manipulations": {
-    "slater": 82,
-    "kemeny": 97,
-    "copeland": 92,
-    "bucklin": 92,
-    "borda": 100
+  "condorcet_lost": {
+    "stv": 25,
+    "slater": 5,
+    "kemeny": 3,
+    "bucklin": 16,
+    "borda": 25
   },
-  "pref_changed": 2
+  "irr_cand_affect": {
+    "stv": 98,
+    "slater": 98,
+    "kemeny": 98,
+    "copeland": 98,
+    "bucklin": 98,
+    "borda": 98
+  },
+  "manipulations": {
+    "slater": 95,
+    "kemeny": 99,
+    "copeland": 95,
+    "bucklin": 93,
+    "borda": 99
+  },
+  "pref_changed": {
+    "stv": 4
+  }
 }
 cond.json
 {
   "total": 100,
-  "condorcet_lost": 48,
-  "irr_cand_affect": 32,
+  "condorcet_lost": {
+    "stv": 29,
+    "slater": 5,
+    "kemeny": 5,
+    "bucklin": 19,
+    "borda": 24
+  },
+  "irr_cand_affect": {
+    "stv": 100,
+    "slater": 96,
+    "kemeny": 96,
+    "copeland": 96,
+    "bucklin": 96,
+    "borda": 96
+  },
   "manipulations": {
     "stv": 100,
     "slater": 100,
     "kemeny": 100,
-    "copeland": 100,
+    "copeland": 99,
+    "bucklin": 100,
+    "borda": 100
+  }
+}
+peak_cond_dumb.json
+{
+  "total": 100,
+  "condorcet_lost": {
+    "stv": 49,
+    "slater": 7,
+    "kemeny": 7,
+    "bucklin": 36,
+    "borda": 26
+  },
+  "irr_cand_affect": {
+    "stv": 97,
+    "slater": 65,
+    "kemeny": 65,
+    "copeland": 82,
+    "bucklin": 65,
+    "borda": 43
+  },
+  "manipulations": {
+    "slater": 97,
+    "kemeny": 97,
+    "copeland": 97,
+    "bucklin": 97,
+    "borda": 95
+  },
+  "pref_changed": {
+    "stv": 3
+  }
+}
+peak_cond.json
+{
+  "total": 100,
+  "condorcet_lost": {
+    "stv": 43,
+    "slater": 9,
+    "kemeny": 9,
+    "bucklin": 25,
+    "borda": 33
+  },
+  "irr_cand_affect": {
+    "stv": 94,
+    "slater": 89,
+    "kemeny": 89,
+    "copeland": 89,
+    "bucklin": 89,
+    "borda": 1
+  },
+  "manipulations": {
+    "stv": 100,
+    "slater": 98,
+    "kemeny": 96,
+    "copeland": 98,
     "bucklin": 100,
     "borda": 100
   },
-  "pref_changed": 2
-}
-irrelevant_changes.json
-{
-  "total": 1,
-  "condorcet_lost": 0,
-  "irr_cand_affect": 0,
-  "manipulations": {},
-  "pref_changed": 0
+  "pref_changed": {
+    "stv": 11
+  }
 }
 peak_dumb.json
 {
   "total": 100,
-  "condorcet_lost": 67,
-  "irr_cand_affect": 31,
+  "condorcet_lost": {
+    "stv": 35,
+    "slater": 8,
+    "kemeny": 8,
+    "copeland": 6,
+    "bucklin": 30,
+    "borda": 28
+  },
+  "irr_cand_affect": {
+    "stv": 100,
+    "slater": 93,
+    "kemeny": 93,
+    "copeland": 93,
+    "bucklin": 93,
+    "borda": 79
+  },
   "manipulations": {
-    "slater": 99,
-    "kemeny": 92,
-    "copeland": 99,
-    "bucklin": 99,
+    "slater": 100,
+    "kemeny": 100,
+    "copeland": 100,
+    "bucklin": 100,
     "borda": 100
   },
-  "pref_changed": 12
+  "pref_changed": {
+    "stv": 20,
+    "copeland": 3
+  }
 }
 peak.json
 {
   "total": 100,
-  "condorcet_lost": 69,
-  "irr_cand_affect": 33,
+  "condorcet_lost": {
+    "stv": 34,
+    "slater": 2,
+    "kemeny": 2,
+    "copeland": 1,
+    "bucklin": 31,
+    "borda": 29
+  },
+  "irr_cand_affect": {
+    "stv": 98,
+    "slater": 96,
+    "kemeny": 96,
+    "copeland": 96,
+    "bucklin": 96,
+    "borda": 49
+  },
   "manipulations": {
     "stv": 100,
-    "slater": 98,
-    "kemeny": 98,
-    "copeland": 100,
+    "slater": 99,
+    "kemeny": 99,
+    "copeland": 99,
+    "bucklin": 99,
+    "borda": 100
+  },
+  "pref_changed": {
+    "stv": 23,
+    "copeland": 1
+  }
+}
+peak_pref_dumb.json
+{
+  "total": 100,
+  "condorcet_lost": {
+    "stv": 34,
+    "slater": 7,
+    "kemeny": 7,
+    "copeland": 3,
+    "bucklin": 25,
+    "borda": 40
+  },
+  "irr_cand_affect": {
+    "stv": 96,
+    "slater": 96,
+    "kemeny": 96,
+    "copeland": 96,
+    "bucklin": 96,
+    "borda": 96
+  },
+  "manipulations": {
+    "stv": 91,
+    "slater": 97,
+    "kemeny": 97,
+    "copeland": 97,
+    "bucklin": 98,
+    "borda": 100
+  },
+  "pref_changed": {
+    "stv": 16
+  }
+}
+peak_pref.json
+{
+  "total": 100,
+  "condorcet_lost": {
+    "stv": 35,
+    "slater": 5,
+    "kemeny": 5,
+    "copeland": 4,
+    "bucklin": 21,
+    "borda": 30
+  },
+  "irr_cand_affect": {
+    "stv": 99,
+    "slater": 95,
+    "kemeny": 95,
+    "copeland": 95,
+    "bucklin": 95,
+    "borda": 95
+  },
+  "manipulations": {
+    "stv": 100,
+    "slater": 100,
+    "kemeny": 100,
+    "copeland": 97,
     "bucklin": 100,
     "borda": 100
   },
-  "pref_changed": 18
+  "pref_changed": {
+    "stv": 13
+  }
 }
 pref_dumb.json
 {
   "total": 100,
-  "condorcet_lost": 43,
-  "irr_cand_affect": 38,
-  "manipulations": {
-    "slater": 98,
-    "kemeny": 98,
-    "copeland": 86,
-    "bucklin": 98,
-    "borda": 98
+  "condorcet_lost": {
+    "stv": 30,
+    "slater": 17,
+    "kemeny": 15,
+    "copeland": 12,
+    "bucklin": 28,
+    "borda": 34
   },
-  "pref_changed": 4
+  "irr_cand_affect": {
+    "stv": 97,
+    "slater": 99,
+    "kemeny": 99,
+    "copeland": 99,
+    "bucklin": 99,
+    "borda": 97
+  },
+  "manipulations": {
+    "slater": 100,
+    "kemeny": 98,
+    "copeland": 100,
+    "bucklin": 98,
+    "borda": 99
+  },
+  "pref_changed": {
+    "stv": 1,
+    "copeland": 4
+  }
 }
 pref.json
 {
   "total": 100,
-  "condorcet_lost": 45,
-  "irr_cand_affect": 37,
+  "condorcet_lost": {
+    "stv": 25,
+    "slater": 12,
+    "kemeny": 12,
+    "copeland": 10,
+    "bucklin": 21,
+    "borda": 32
+  },
+  "irr_cand_affect": {
+    "stv": 99,
+    "slater": 99,
+    "kemeny": 99,
+    "copeland": 99,
+    "bucklin": 99,
+    "borda": 99
+  },
   "manipulations": {
     "stv": 100,
     "slater": 100,
     "kemeny": 100,
-    "copeland": 100,
+    "copeland": 98,
     "bucklin": 100,
     "borda": 100
   },
-  "pref_changed": 3
-}
-reg_3_10.json
-{
-  "total": 100,
-  "condorcet_lost": 51,
-  "irr_cand_affect": 48,
-  "manipulations": {
-    "stv": 97,
-    "slater": 100,
-    "kemeny": 100,
-    "copeland": 99,
-    "bucklin": 100,
-    "borda": 100
-  },
-  "pref_changed": 0
+  "pref_changed": {
+    "stv": 1,
+    "copeland": 1
+  }
 }
 reg_dumb.json
 {
   "total": 100,
-  "condorcet_lost": 76,
-  "irr_cand_affect": 50,
-  "manipulations": {
-    "stv": 87,
+  "condorcet_lost": {
+    "stv": 38,
+    "slater": 24,
+    "kemeny": 20,
+    "copeland": 19,
+    "bucklin": 38,
+    "borda": 46
+  },
+  "irr_cand_affect": {
+    "stv": 100,
     "slater": 100,
-    "kemeny": 84,
+    "kemeny": 100,
     "copeland": 100,
-    "bucklin": 98,
+    "bucklin": 100,
     "borda": 100
   },
-  "pref_changed": 0
+  "manipulations": {
+    "slater": 99,
+    "kemeny": 99,
+    "copeland": 99,
+    "bucklin": 98,
+    "borda": 99
+  },
+  "pref_changed": {
+    "copeland": 6
+  }
 }
 reg.json
 {
   "total": 100,
-  "condorcet_lost": 62,
-  "irr_cand_affect": 47,
+  "condorcet_lost": {
+    "stv": 35,
+    "slater": 21,
+    "kemeny": 20,
+    "copeland": 13,
+    "bucklin": 29,
+    "borda": 30
+  },
+  "irr_cand_affect": {
+    "stv": 98,
+    "slater": 98,
+    "kemeny": 98,
+    "copeland": 100,
+    "bucklin": 74,
+    "borda": 93
+  },
   "manipulations": {
     "stv": 100,
     "slater": 100,
     "kemeny": 100,
-    "copeland": 93,
+    "copeland": 98,
     "bucklin": 100,
     "borda": 100
   },
-  "pref_changed": 4
+  "pref_changed": {
+    "stv": 14,
+    "copeland": 1
+  }
 }

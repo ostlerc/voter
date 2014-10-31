@@ -13,10 +13,10 @@ import (
 )
 
 type TallySum struct {
-	PrefChanged   int            `json:"pref_changed"`
-	M             map[string]int `json:"manipulations"`
-	Irrelevant    int            `json:"irr_cand_affect"`
-	CondorcetLost int            `json:"condorcet_lost"`
+	PrefChanged   map[string]int `json:"pref_changed,omitempty"`
+	M             map[string]int `json:"manipulations,omitempty"`
+	Irrelevant    map[string]int `json:"irr_cand_affect,omitempty"`
+	CondorcetLost map[string]int `json:"condorcet_lost,omitempty"`
 	Total         int            `json:"total"`
 }
 
@@ -30,7 +30,10 @@ func main() {
 
 	var res election.TallyResult
 	sum := &TallySum{
-		M: make(map[string]int),
+		M:             make(map[string]int),
+		PrefChanged:   make(map[string]int),
+		Irrelevant:    make(map[string]int),
+		CondorcetLost: make(map[string]int),
 	}
 	for err == nil && len(dat) > 0 {
 		err := json.Unmarshal(dat, &res)
@@ -44,19 +47,22 @@ func main() {
 			}
 		}
 
-		if res.PrefIntact != nil && !*res.PrefIntact {
-			sum.PrefChanged++
+		for k, v := range res.PrefIntact {
+			if !v {
+				sum.PrefChanged[k]++
+			}
 		}
 
-		if res.Irrelevant != nil && res.Irrelevant.ChangesWinner {
-			sum.Irrelevant++
+		for k, v := range res.Irrelevant {
+			if v.ChangesWinner {
+				sum.Irrelevant[k]++
+			}
 		}
 
 		if res.Condorcet != nil {
-			for _, v := range res.Results {
+			for k, v := range res.Results {
 				if v[0]+1 != *res.Condorcet && v[0] != -1 {
-					sum.CondorcetLost++
-					break
+					sum.CondorcetLost[k]++
 				}
 			}
 		}

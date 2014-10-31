@@ -21,8 +21,9 @@ var (
 	dumb = flag.Bool("dumb", false, "Use dumb scoring (only check if manipulation changes top candidate to your top candidate")
 )
 
-func irrelevant(e *election.Election, tallies map[string][]int) *election.IrrelevantCand {
+func irrelevant(e *election.Election, tallies map[string][]int) map[string]*election.IrrelevantCand {
 	found := make(map[int]bool)
+	res := make(map[string]*election.IrrelevantCand)
 	for _, v := range tallies {
 		found[v[0]] = true //not in a first place, then you are IRRELEVANT!
 	}
@@ -46,20 +47,16 @@ func irrelevant(e *election.Election, tallies map[string][]int) *election.Irrele
 	e2 := e.RemoveCandidate(cand)
 	for k, v := range tallies {
 		t := election.GetTally(k)
-		res := t.Tally(e2)
-		if v[0] != res[0] {
-
-			return &election.IrrelevantCand{
+		tres := t.Tally(e2)
+		if v[0] != tres[0] {
+			res[k] = &election.IrrelevantCand{
 				Candidate:     name,
 				ChangesWinner: true,
 			}
 		}
 	}
 
-	return &election.IrrelevantCand{
-		Candidate:     name,
-		ChangesWinner: false,
-	}
+	return res
 }
 
 func main() {
@@ -97,12 +94,12 @@ func main() {
 
 	manipulations := make(map[string]*election.Manipulation)
 
-	prefIntact := true
+	prefIntact := make(map[string]bool)
 	if e.F == nil {
 		e.F = e.Pref()
 	}
 
-	irrCand := irrelevant(e, m)
+	irrCands := irrelevant(e, m)
 
 	keys := make(sort.StringSlice, 0) //making this list guarantees ordering. Range on map has no guaranteed order
 	for k, _ := range m {
@@ -119,13 +116,14 @@ func main() {
 		}
 
 		if e.F != nil {
-			for j := 0; j < len(keys) && prefIntact; j++ {
+			for j := 0; j < len(keys); j++ {
+				prefIntact[keys[j]] = true
 				for _, v := range m[keys[j]] {
 					if v == e.F.First {
 						break
 					}
 					if v == e.F.Second {
-						prefIntact = false
+						prefIntact[keys[j]] = false
 						break
 					}
 					if keys[j] == "bucklin" {
@@ -138,8 +136,10 @@ func main() {
 
 	if *o == "json" {
 		res := &election.TallyResult{
-			Results: m,
-			Names:   e.M,
+			Results:    m,
+			Names:      e.M,
+			PrefIntact: make(map[string]bool),
+			Irrelevant: make(map[string]*election.IrrelevantCand),
 		}
 
 		if c := e.Condorcet() + 1; c != 0 {
@@ -150,9 +150,13 @@ func main() {
 			res.M = manipulations
 			res.Election = e
 			if e.F != nil {
-				res.PrefIntact = &prefIntact
+				for k, v := range prefIntact {
+					res.PrefIntact[k] = v
+				}
 			}
-			res.Irrelevant = irrCand
+			for k, v := range irrCands {
+				res.Irrelevant[k] = v
+			}
 		}
 
 		dat, err := json.Marshal(res)
@@ -204,6 +208,34 @@ func main() {
 				}
 				fmt.Println("")
 			}
+
+			if e.F != nil {
+				fmt.Printf("pref intact,")
+				for j := 0; j < len(keys); j++ {
+					if v, ok := prefIntact[keys[j]]; ok && v {
+						fmt.Print("true")
+					} else {
+						fmt.Print("false")
+					}
+					if j+1 != len(prefIntact) {
+						fmt.Print(",")
+					}
+				}
+				fmt.Println("")
+			}
+			fmt.Printf("irrlvnt alters,")
+			for j := 0; j < len(keys); j++ {
+				if _, ok := irrCands[keys[j]]; ok {
+					fmt.Print("true")
+				} else {
+					fmt.Print("false")
+				}
+				if j+1 != len(irrCands) {
+					fmt.Print(",")
+				}
+
+			}
+			fmt.Println("")
 		}
 		end := len(m[talliers[0].Key()])
 		for i := 0; i < end; i++ {
@@ -231,15 +263,6 @@ func main() {
 				}
 			}
 			fmt.Println("")
-		}
-
-		if *v {
-			if e.F != nil {
-				fmt.Printf("pref intact,%v\n", prefIntact)
-			}
-			if irrCand != nil {
-				fmt.Printf("irrlvnt alters,%v,%v\n", irrCand.Candidate, irrCand.ChangesWinner)
-			}
 		}
 	}
 }

@@ -70,6 +70,7 @@ tally
             ...
         }
     }
+
     - sample (verbose and pretty printed) csv output
         weight          5      4      3      6
         Alex            5      1      6      4
@@ -79,10 +80,12 @@ tally
         Erik            6      5      3      1
         Frank           3      2      2      6
         Greg            7      7      4      7
-        pref            5      2
 
+        pref            5      2
         rank            borda  bucklin  copeland  kemeny  slater  stv
         manipulation    true   true     true      true    true    true
+        pref intact     true   true     true      true    true    true
+        irrlvnt alters  false  false    false     false   false   false
         1               Erik   Erik     Alex      Erik    Alex    Erik
         2               Alex   Bart     -1        Alex    David   Alex
         3               Frank  -1       -1        David   Erik    David
@@ -90,9 +93,6 @@ tally
         5               Cindy  -1       -1        Cindy   Frank   Bart
         6               Bart   -1       -1        Bart    Cindy   Cindy
         7               Greg   -1       -1        Greg    Greg    Greg
-
-        pref intact     true
-        irrlvnt alters  Bart   false
 
 graph
 =====
@@ -140,19 +140,33 @@ poll
 
     - sample json output
     {
-        "pref_changed": 25,
-        "manipulations": {
-            "borda": 200,
-            "bucklin": 200,
-            "copeland": 199,
-            "kemeny": 187,
-            "slater": 196,
-            "stv": 200
+        "total": 100,
+        "condorcet_lost": {
+            "stv": 25,
+            "slater": 5,
+            "kemeny": 3,
+            "bucklin": 16,
+            "borda": 25
         },
-        "irr_cand_affect": 70,
-        "total": 200
+        "irr_cand_affect": {
+            "stv": 98,
+            "slater": 98,
+            "kemeny": 98,
+            "copeland": 98,
+            "bucklin": 98,
+            "borda": 98
+        },
+        "manipulations": {
+            "slater": 95,
+            "kemeny": 99,
+            "copeland": 95,
+            "bucklin": 93,
+            "borda": 99
+        },
+        "pref_changed": {
+            "stv": 4
+        }
     }
-
 
 Examples
 ========
@@ -188,3 +202,40 @@ Output is in csv form and pretty printed to the screen.
 
 In this example we create 100 elections and verbose tally them. The elections are stored in a file called 'res.json'.
 After the elections are created we then pipe them into poll and receive our pretty printed json results
+
+Generation
+==========
+
+For some sample ways to generate poll files, you can look at samples/gen.sh. The samples folder contains all the
+poll files as examples for using this software.
+
+Results
+=======
+
+I have generated a fair amount of elections and placed them inside of the samples folder. For each of these
+elections I did a verbose tally and printed the results in the samples/results.json file. I have noticed that
+manipulating an election is much easier than I had anticipated. In fact, I was so surprised that I generated a
+few different ways of scoring (comparing) votes to see if a dumb way would provide different results. My first
+method of scoring is complicated and smart. Weighting top candidates and lower candidates out of position
+negatively. The next voting mechanism I made is called 'dumb'. You can provide the dumb flag to the tally
+binary and it will use the dumb scoring method instead of the smart one. The results were shockingly similar.
+The dumb scoring method only says a manipulation is successful if your top candidate was not in first, and by 
+voting differently your top candidate has now become the winner. As you can see, manipulations are around 95%
+possible by any of the randomly generated elections I have seen. The exception to this is the stv, when scoring
+scoring with dumb then little to no manipulations were found. This was especially true when condorcet winners 
+or peak voting was occuring.
+
+
+I played around with candidate size and vote size but it seemed to have minor effects on the numbers.
+Generating large elections is easy, but tallying and find manipulations is a slow processes as most of The
+algorithms are polynomial and poorly written. (by me)
+
+The changing of preferences is more difficult than manipulation. That seems to only be around 10% of the time
+possible. Condorcet winners can also lose quite a lot - up to 50% of my elections had a voting scheme that
+allowed the condorcet winner to not be the winner. Kemeny seems to be the most resilient to manipulations.
+Removing irrelevant candidates changed the top winner almost 90% of the time. Borda has shown to be more
+difficult to make irrelevant candidates change the top winner, but it still has around 45% chance of that
+affecting the results.
+
+Preferences changing was very rare. STV seemed to be the most likely scheme where this will happen, and even
+so it is only around 13% of the time. Copeland has around a 5% chance that preferences could not be preserved.

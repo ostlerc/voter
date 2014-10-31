@@ -37,13 +37,13 @@ type IrrelevantCand struct {
 }
 
 type TallyResult struct {
-	Results    map[string][]int         `json:"results"`
-	Names      map[string]string        `json:"names,omitempty"`
-	Condorcet  *int                     `json:"condorcet,omitempty"`
-	Election   *Election                `json:"election,omitempty"`
-	M          map[string]*Manipulation `json:"manipulations,omitempty"`
-	PrefIntact *bool                    `json:"pref_intact,omitempty"`
-	Irrelevant *IrrelevantCand          `json:"irr_cand,omitempty"`
+	Results    map[string][]int           `json:"results"`
+	Names      map[string]string          `json:"names,omitempty"`
+	Condorcet  *int                       `json:"condorcet,omitempty"`
+	Election   *Election                  `json:"election,omitempty"`
+	M          map[string]*Manipulation   `json:"manipulations,omitempty"`
+	PrefIntact map[string]bool            `json:"pref_intact,omitempty"`
+	Irrelevant map[string]*IrrelevantCand `json:"irr_cand,omitempty"`
 }
 
 type Tallier interface {
