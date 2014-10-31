@@ -1,0 +1,140 @@
+cond_dumb.json
+{
+  "total": 100,
+  "condorcet_lost": 53,
+  "irr_cand_affect": 47,
+  "manipulations": {
+    "slater": 82,
+    "kemeny": 97,
+    "copeland": 92,
+    "bucklin": 92,
+    "borda": 100
+  },
+  "pref_changed": 2
+}
+cond.json
+{
+  "total": 100,
+  "condorcet_lost": 48,
+  "irr_cand_affect": 32,
+  "manipulations": {
+    "stv": 100,
+    "slater": 100,
+    "kemeny": 100,
+    "copeland": 100,
+    "bucklin": 100,
+    "borda": 100
+  },
+  "pref_changed": 2
+}
+irrelevant_changes.json
+{
+  "total": 1,
+  "condorcet_lost": 0,
+  "irr_cand_affect": 0,
+  "manipulations": {},
+  "pref_changed": 0
+}
+peak_dumb.json
+{
+  "total": 100,
+  "condorcet_lost": 67,
+  "irr_cand_affect": 31,
+  "manipulations": {
+    "slater": 99,
+    "kemeny": 92,
+    "copeland": 99,
+    "bucklin": 99,
+    "borda": 100
+  },
+  "pref_changed": 12
+}
+peak.json
+{
+  "total": 100,
+  "condorcet_lost": 69,
+  "irr_cand_affect": 33,
+  "manipulations": {
+    "stv": 100,
+    "slater": 98,
+    "kemeny": 98,
+    "copeland": 100,
+    "bucklin": 100,
+    "borda": 100
+  },
+  "pref_changed": 18
+}
+pref_dumb.json
+{
+  "total": 100,
+  "condorcet_lost": 43,
+  "irr_cand_affect": 38,
+  "manipulations": {
+    "slater": 98,
+    "kemeny": 98,
+    "copeland": 86,
+    "bucklin": 98,
+    "borda": 98
+  },
+  "pref_changed": 4
+}
+pref.json
+{
+  "total": 100,
+  "condorcet_lost": 45,
+  "irr_cand_affect": 37,
+  "manipulations": {
+    "stv": 100,
+    "slater": 100,
+    "kemeny": 100,
+    "copeland": 100,
+    "bucklin": 100,
+    "borda": 100
+  },
+  "pref_changed": 3
+}
+reg_3_10.json
+{
+  "total": 100,
+  "condorcet_lost": 51,
+  "irr_cand_affect": 48,
+  "manipulations": {
+    "stv": 97,
+    "slater": 100,
+    "kemeny": 100,
+    "copeland": 99,
+    "bucklin": 100,
+    "borda": 100
+  },
+  "pref_changed": 0
+}
+reg_dumb.json
+{
+  "total": 100,
+  "condorcet_lost": 76,
+  "irr_cand_affect": 50,
+  "manipulations": {
+    "stv": 87,
+    "slater": 100,
+    "kemeny": 84,
+    "copeland": 100,
+    "bucklin": 98,
+    "borda": 100
+  },
+  "pref_changed": 0
+}
+reg.json
+{
+  "total": 100,
+  "condorcet_lost": 62,
+  "irr_cand_affect": 47,
+  "manipulations": {
+    "stv": 100,
+    "slater": 100,
+    "kemeny": 100,
+    "copeland": 93,
+    "bucklin": 100,
+    "borda": 100
+  },
+  "pref_changed": 4
+}

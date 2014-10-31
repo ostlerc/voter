@@ -70,11 +70,29 @@ tally
             ...
         }
     }
-    - sample csv output
-        rank,slater,kemeny
-        1,Alex,Erik
-        2,David,Alex
-        ...
+    - sample (verbose and pretty printed) csv output
+        weight          5      4      3      6
+        Alex            5      1      6      4
+        Bart            1      6      5      5
+        Cindy           2      3      7      3
+        David           4      4      1      2
+        Erik            6      5      3      1
+        Frank           3      2      2      6
+        Greg            7      7      4      7
+        pref            5      2
+
+        rank            borda  bucklin  copeland  kemeny  slater  stv
+        manipulation    true   true     true      true    true    true
+        1               Erik   Erik     Alex      Erik    Alex    Erik
+        2               Alex   Bart     -1        Alex    David   Alex
+        3               Frank  -1       -1        David   Erik    David
+        4               David  -1       -1        Frank   Bart    Frank
+        5               Cindy  -1       -1        Cindy   Frank   Bart
+        6               Bart   -1       -1        Bart    Cindy   Cindy
+        7               Greg   -1       -1        Greg    Greg    Greg
+
+        pref intact     true
+        irrlvnt alters  Bart   false
 
 graph
 =====

@@ -7,15 +7,15 @@ func init() {
 }
 
 func (*TallyCopeland) Tally(e *Election) []int {
-	return e.Copeland()
+	res := e.Copeland()
+	if res[0] == -1 {
+		res[0] = 0
+	}
+	return res
 }
 
 func (*TallyCopeland) Key() string {
 	return "copeland"
-}
-
-func (*TallyCopeland) Irrelevant(l []int) int {
-	return -1
 }
 
 // Returns Copeland result

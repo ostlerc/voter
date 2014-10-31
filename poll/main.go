@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -20,6 +21,7 @@ type TallySum struct {
 }
 
 func main() {
+	flag.Parse()
 	r := bufio.NewReader(os.Stdin)
 	dat, err := r.ReadBytes('\n')
 	if err != nil {

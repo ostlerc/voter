@@ -73,8 +73,13 @@ func Setup() { //Requires flag.parse to have been called
 	}
 }
 
+var DumbScore = false
+
 // Returns a score of how similar the votes are. 0 is exact match
 func (v *Vote) Score(r []int) int {
+	if DumbScore {
+		return v.DumbScore(r)
+	}
 	h := make(map[int]int) //map candidates to index
 	for k, v := range v.C {
 		ki, err := strconv.Atoi(k)
@@ -104,6 +109,13 @@ func (v *Vote) Score(r []int) int {
 		}
 	}
 	return res
+}
+
+func (v *Vote) DumbScore(r []int) int {
+	if v.C["0"] == r[0] {
+		return 0
+	}
+	return 1
 }
 
 func (v *Vote) PeakValue() int {

@@ -14,10 +14,11 @@ import (
 )
 
 var (
-	t = flag.String("t", election.CSVFlat(election.TallyKeys()), "tally type results")
-	o = flag.String("o", "csv", "output type [json,csv]")
-	i = flag.String("i", "json", "tally input type. ["+election.CSVFlat(election.Parsers())+"]")
-	v = flag.Bool("v", false, "verbose output. Show all tally information")
+	t    = flag.String("t", election.CSVFlat(election.TallyKeys()), "tally type results")
+	o    = flag.String("o", "csv", "output type [json,csv]")
+	i    = flag.String("i", "json", "tally input type. ["+election.CSVFlat(election.Parsers())+"]")
+	v    = flag.Bool("v", false, "verbose output. Show all tally information")
+	dumb = flag.Bool("dumb", false, "Use dumb scoring (only check if manipulation changes top candidate to your top candidate")
 )
 
 func irrelevant(e *election.Election, tallies map[string][]int) *election.IrrelevantCand {
@@ -64,6 +65,8 @@ func irrelevant(e *election.Election, tallies map[string][]int) *election.Irrele
 func main() {
 	flag.Parse()
 	election.Setup()
+
+	election.DumbScore = *dumb
 
 	if *o != "json" && *o != "csv" {
 		log.Fatal("Invalid output type '", *o, "'")
