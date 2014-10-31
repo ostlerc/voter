@@ -26,4 +26,28 @@ func TestSTV(t *testing.T) {
 	if !ArEq(v, []int{1, 0, 2}) {
 		t.Fatal("Invalid stv result", v)
 	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+
+	v = e.STV()
+	if !ArEq(v, []int{1, 0, 2}) {
+		t.Fatal("Invalid stv result", v)
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 2, "1": 0, "2": 1}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+
+	v = e.STV()
+	if !ArEq(v, []int{1, 2, 0}) {
+		t.Fatal("Invalid stv result", v)
+	}
 }

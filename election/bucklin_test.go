@@ -1,9 +1,6 @@
 package election
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 func TestBucklin(t *testing.T) {
 	e := &Election{V: []*Vote{
@@ -52,7 +49,6 @@ func TestBucklin(t *testing.T) {
 		t.Fatal("Incorrect bucklin value", b)
 	}
 
-	fmt.Println("NOW")
 	e = &Election{V: []*Vote{
 		&Vote{C: map[string]int{"0": 3, "1": 5, "2": 2, "3": 1, "4": 4}, W: 2},
 		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 3, "3": 5, "4": 4}, W: 4},

@@ -160,6 +160,15 @@ func main() {
 	} else {
 		if *v {
 			fmt.Println(e.CSV())
+
+			f := e.Pref()
+			if f != nil {
+				fmt.Printf("\npref,%d,%d", f.First+1, f.Second+1)
+			}
+			c := e.Condorcet()
+			if c != -1 {
+				fmt.Printf("\ncondorcet,%d\n", c+1)
+			}
 		}
 
 		fmt.Print("rank,")

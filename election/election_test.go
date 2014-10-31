@@ -1,7 +1,7 @@
 package election
 
 import (
-	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -140,7 +140,7 @@ func TestScore(t *testing.T) {
 	}
 }
 
-var csvelection = `,5,4,3,6
+var csvelection = `weight,5,4,3,6
 Alex,5,1,6,4
 Bart,1,6,5,5
 Cindy,2,3,7,3
@@ -256,10 +256,10 @@ func TestManipulation(t *testing.T) {
 		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
 		N: 3,
 	}
-	m := e.FindManipulation(GetTally("stv"))
-	dat, err := json.Marshal(m)
-	if err != nil {
-		t.Fatal(err)
+	tally := GetTally("stv")
+	fmt.Println(tally.Tally(e))
+	m := e.FindManipulation(tally)
+	if m == nil {
+		t.Fatal("Invalid, should have found a manipulation")
 	}
-	t.Fatal(string(dat))
 }

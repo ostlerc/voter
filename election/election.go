@@ -248,14 +248,6 @@ func (e *Election) CSV() string {
 			res += fmt.Sprint("\n")
 		}
 	}
-	f := e.Pref()
-	if f != nil {
-		res += fmt.Sprintf("\npref,%d,%d", f.First+1, f.Second+1)
-	}
-	c := e.Condorcet()
-	if c != -1 {
-		res += fmt.Sprintf("\ncondorcet,%d\n", c+1)
-	}
 	return res
 }
 
