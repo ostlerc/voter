@@ -1,7 +1,6 @@
 package election
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -250,16 +249,52 @@ func TestPeak(t *testing.T) {
 }
 
 func TestManipulation(t *testing.T) {
-	e := &Election{V: []*Vote{
+	/*e := &Election{V: []*Vote{
 		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
 		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
 		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
 		N: 3,
 	}
 	tally := GetTally("stv")
-	fmt.Println(tally.Tally(e))
 	m := e.FindManipulation(tally)
 	if m == nil {
 		t.Fatal("Invalid, should have found a manipulation")
+	}*/
+}
+
+func TestVotes(t *testing.T) {
+	e := &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1}},
+		N: 3,
+	}
+
+	if e.Votes() != 3 {
+		t.Fatal("Incorrect # of votes")
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 14},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 1},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 25}},
+		N: 3,
+	}
+
+	if e.Votes() != 40 {
+		t.Fatal("Incorrect # of votes", e.Votes())
+	}
+}
+
+func TestAfter(t *testing.T) {
+	v := &Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 25}
+	if v.after(1) != 2 {
+		t.Fatal("Incorrect after")
+	}
+	if v.after(2) != 0 {
+		t.Fatal("Incorrect after")
+	}
+	if v.after(0) != -1 {
+		t.Fatal("Incorrect after")
 	}
 }

@@ -1,15 +1,37 @@
 package election
 
-import "strconv"
+import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+)
 
-type TallySTV struct{}
+type TallySTV struct {
+	Droop  int
+	e      *Election
+	Score  Ints
+	Ignore Ints
+	Votes  []Ints
+	Start  int
+	End    int
+	res    Ints
+}
+
+func tojson(i interface{}) string {
+	dat, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	return string(dat)
+}
 
 func init() {
 	RegisterTally(&TallySTV{})
 }
 
-func (*TallySTV) Tally(e *Election) []int {
-	return e.STV()
+func (t *TallySTV) Tally(e *Election) []int {
+	t.e = e
+	return t.STV()
 }
 
 func (*TallySTV) Key() string {
@@ -17,41 +39,85 @@ func (*TallySTV) Key() string {
 }
 
 // Returns STV result
-func (e *Election) STV() []int {
-	res := make([]int, e.N)
-	ignore := make([]int, 0)
+func (t *TallySTV) STV() []int {
+	e := t.e
+	t.Droop = e.Votes()/e.N + 1
+	fmt.Println("droop=", t.Droop, e.Votes(), e.N)
+	t.res = make([]int, e.N)
+	t.Ignore = make([]int, 0)
+	t.Start = 0
+	t.End = e.N
+	t.Votes = e.CandVotes()
+	t.Score = make([]int, e.N)
+	copy(t.Score, t.Votes[0])
+	for t.Start != t.End {
+		t.step()
+	}
+	return t.res
+}
+
+func (e *Election) CandVotes() []Ints {
+	res := make([]Ints, e.N, e.N)
 	for i := 0; i < e.N; i++ {
-		score := e.stv(ignore)
-		min := -1
-		mini := 0
-		for j := 0; j < e.N; j++ {
-			if Contains(j, ignore) {
-				continue
-			}
-			if min == -1 || score[j] <= min {
-				min = score[j]
-				mini = j
-			}
+		res[i] = make([]int, e.N, e.N)
+		for _, v := range e.V {
+			res[i][v.C[strconv.Itoa(i)]] += v.W
 		}
-		res[e.N-i-1] = mini
-		ignore = append(ignore, mini)
 	}
 	return res
 }
 
-func (e *Election) stv(ignore []int) []int {
-	res := make([]int, e.N)
-	for _, v := range e.V {
-		for i := 0; i < len(v.C); i++ {
-			cand := v.C[strconv.Itoa(i)]
-			if !Contains(cand, ignore) {
-				for len(res) <= cand {
-					res = append(res, 0)
-				}
-				res[cand]++
-				break
-			}
+//distributes from i to scores.
+func (t *TallySTV) step() {
+	fmt.Println(tojson(t))
+	c := t.Score.Maxi(t.Ignore)
+	if t.Score[c] >= t.Droop {
+		fmt.Println("Winner", c, t.Score[c])
+		t.Start++
+	} else {
+		c = t.Score.Mini(t.Ignore)
+		fmt.Println("loser", c, t.Score[c])
+		t.End--
+	}
+	t.distribute(c)
+	t.Ignore = append(t.Ignore, c)
+	t.res = append(t.res, c)
+}
+
+func (t *TallySTV) distribute(i int) {
+	ratio := float64(1)
+	if t.Score[i] >= t.Droop {
+		ratio = float64(t.Score[i]-t.Droop) / float64(t.Score[i])
+		fmt.Println("Ratio:", ratio, t.Score[i], t.Droop)
+	}
+
+	a := t.after(i)
+	for k := 0; k < len(t.Score); k++ {
+		t.Score[k] += int(ratio * float64(a[k]))
+	}
+}
+
+func (t *TallySTV) after(k int) Ints {
+	res := make(Ints, t.e.N, t.e.N)
+	for _, v := range t.e.V {
+		if !t.first(v, k) {
+			continue
+		}
+
+		if x := v.after(k); x != -1 {
+			res[x] += v.W
 		}
 	}
 	return res
+}
+
+func (t *TallySTV) first(v *Vote, k int) bool {
+	for i := 0; i < len(v.C); i++ {
+		x := v.C[strconv.Itoa(i)]
+		if !Contains(x, t.Ignore) {
+			return x == k
+		}
+	}
+
+	return false
 }

@@ -28,6 +28,7 @@ type Election struct {
 type Vote struct {
 	C    map[string]int `json:"vote"`
 	W    int            `json:"weight"`
+	D    bool           `json:"diminish"`
 	Peak *int           `json:"peak,omitempty"`
 }
 
@@ -391,6 +392,7 @@ func (v *Vote) Copy() *Vote {
 	return &Vote{
 		C:    c,
 		W:    v.W,
+		D:    v.D,
 		Peak: v.Peak,
 	}
 }
@@ -415,6 +417,14 @@ func (e *Election) RemoveCandidate(k int) *Election {
 		v.RemoveCandidate(k)
 	}
 
+	return res
+}
+
+func (e *Election) Votes() int {
+	res := 0
+	for _, v := range e.V {
+		res += v.W
+	}
 	return res
 }
 
@@ -449,6 +459,29 @@ func (v *Vote) Rank(k int) string {
 	}
 	log.Println(k, v.C)
 	panic("Not Found")
+}
+
+func (v *Vote) Ranki(k int) int {
+	for key, v := range v.C {
+		if v == k {
+			ret, err := strconv.Atoi(key)
+			if err != nil {
+				panic(err)
+			}
+			return ret
+		}
+	}
+	log.Println(k, v.C)
+	panic("Not Found")
+}
+
+//who comes after candidate k? -1 for none
+func (v *Vote) after(k int) int {
+	r := v.Ranki(k)
+	if r+1 == len(v.C) {
+		return -1
+	}
+	return v.C[strconv.Itoa(r+1)]
 }
 
 func NewPref(c int) *IntPair {

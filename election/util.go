@@ -2,6 +2,8 @@ package election
 
 import "strconv"
 
+type Ints []int
+
 type IntPair struct {
 	First  int `json:"a"`
 	Second int `json:"b"`
@@ -97,4 +99,74 @@ func CSVFlat(l []string) string {
 		res += s + ","
 	}
 	return res[:len(res)-1]
+}
+
+func (i Ints) Max() int {
+	if len(i) == 0 {
+		panic("Max on empty list")
+	}
+	m := i[0]
+	for _, v := range i {
+		if v > m {
+			m = v
+		}
+	}
+	return m
+}
+
+func (i Ints) Min() int {
+	if len(i) == 0 {
+		panic("Max on empty list")
+	}
+	m := i[0]
+	for _, v := range i {
+		if v < m {
+			m = v
+		}
+	}
+	return m
+}
+
+func (i Ints) Maxi(ig Ints) int {
+	if len(i) == 0 {
+		panic("Max on empty list")
+	}
+	m := -1
+	for k, v := range i {
+		if Contains(k, ig) {
+			continue
+		}
+		if m == -1 || v > i[m] {
+			m = k
+		}
+	}
+	return m
+}
+
+func (i Ints) Mini(ig Ints) int {
+	if len(i) == 0 {
+		panic("Max on empty list")
+	}
+	m := -1
+	for k, v := range i {
+		if Contains(k, ig) {
+			continue
+		}
+		if m == -1 || v < i[m] {
+			m = k
+		}
+	}
+	return m
+}
+
+func (i Ints) Minus(ignore Ints) Ints {
+	res := make(Ints, len(i))
+	copy(res, i)
+	for _, v := range i {
+		if Contains(v, i) {
+			continue
+		}
+		res = append(res, v)
+	}
+	return res
 }
