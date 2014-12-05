@@ -413,8 +413,8 @@ func (e *Election) RemoveCandidate(k int) *Election {
 			break
 		}
 	}
-	for _, v := range res.V {
-		v.RemoveCandidate(k)
+	for i := 0; i < len(res.V); i++ {
+		res.V[i] = res.V[i].RemoveCandidate(k)
 	}
 
 	return res
@@ -428,11 +428,18 @@ func (e *Election) Votes() int {
 	return res
 }
 
-func (v *Vote) RemoveCandidate(k int) *Vote {
+func (v *Vote) RemoveCandidate(cand int) *Vote {
 	res := v.Copy()
-	delete(res.C, strconv.Itoa(k))
-	for i := k + 1; i < len(v.C); i++ {
-		res.C[strconv.Itoa(i-1)] = v.C[strconv.Itoa(i)]
+	k := v.Ranki(cand) //get rank of candidate
+	for i := k + 1; i < len(res.C); i++ {
+		res.C[strconv.Itoa(i-1)] = res.C[strconv.Itoa(i)]
+	}
+	delete(res.C, strconv.Itoa(len(res.C)-1)) //remove last
+
+	for _k, v := range res.C {
+		if v > cand {
+			res.C[_k]--
+		}
 	}
 	return res
 }

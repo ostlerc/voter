@@ -86,6 +86,7 @@ func main() {
 	}
 
 	e := election.ParseFrom(*i, os.Stdin)
+	fmt.Println("got", e.N)
 
 	m := make(map[string][]int)
 	for _, t := range talliers {

@@ -298,3 +298,14 @@ func TestAfter(t *testing.T) {
 		t.Fatal("Incorrect after")
 	}
 }
+
+func TestRemoveCandidate(t *testing.T) {
+	v := &Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4}
+	v2 := v.RemoveCandidate(1)
+	if len(v2.C) != 2 || len(v.C) != 3 {
+		t.Fatal("Incorrect candidate removal")
+	}
+	if v2.C["0"] != 1 || v2.C["1"] != 0 || v.C["0"] != 1 || v.C["1"] != 2 || v.C["2"] != 0 {
+		t.Fatal("Incorrect candidate removal", v2.C)
+	}
+}

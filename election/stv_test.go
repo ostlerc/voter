@@ -1,13 +1,6 @@
 package election
 
-import (
-	"fmt"
-	"testing"
-)
-
-func TestSTV(t *testing.T) {
-
-}
+import "testing"
 
 func TestCandVotes(t *testing.T) {
 	e := &Election{V: []*Vote{
@@ -20,19 +13,20 @@ func TestCandVotes(t *testing.T) {
 		N: 3,
 	}
 
+	v1 := &Vote{C: map[string]int{"0": 1, "1": 0}, W: 1}
+	v2 := &Vote{C: map[string]int{"0": 0, "1": 1}, W: 2}
+	e = &Election{V: []*Vote{v1, v2}, N: 2}
+
 	v := e.CandVotes()
-	if !ArEq(v[0], []int{6, 12, 2}) {
-		fmt.Println("Incorrect", v[0])
+	if len(v[0]) != 2 {
+		t.Fatal("Incorrect Size", len(v[0]), tojson(v[0]))
 	}
-	if !ArEq(v[1], []int{9, 5, 6}) {
-		fmt.Println("Incorrect", v[1])
-	}
-	if !ArEq(v[2], []int{5, 3, 12}) {
-		fmt.Println("Incorrect", v[2])
+	if tojson(v[0][0]) != tojson(v2) {
+		t.Fatal("Incorrect element", tojson(v[0][0]))
 	}
 }
 
-func TestDistribute(t *testing.T) {
+func TestSTV(t *testing.T) {
 	e := &Election{V: []*Vote{
 		&Vote{C: map[string]int{"0": 0, "1": 1, "2": 2}, W: 4},
 		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 2},
@@ -42,6 +36,73 @@ func TestDistribute(t *testing.T) {
 		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 1}},
 		N: 3,
 	}
+
 	_t := TallySTV{}
-	_t.Tally(e)
+	res := _t.Tally(e)
+	if !ArEq(res, []int{1, 0, 2}) {
+		t.Fatal("Incorrect stv result", res)
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 0, "1": 1, "2": 2}, W: 4},
+		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 0, "2": 2}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 2, "1": 0, "2": 1}, W: 4},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 4}},
+		N: 3,
+	}
+	c := e.CandVotes()
+	if !ArEq(c.Lens(), []int{8, 8, 8}) {
+		t.Fatal("Incorrect CandVotes")
+	}
+	_t = TallySTV{}
+	res = _t.Tally(e)
+	if !ArEq(res, []int{0, 1, 2}) {
+		t.Fatal("Incorrect stv result", res)
+	}
+
+	e = &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 0, "1": 1, "2": 2}, W: 4},
+		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 0, "2": 2}, W: 4},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 4}},
+		N: 3,
+	}
+	c = e.CandVotes()
+	if !ArEq(c.Lens(), []int{8, 8, 8}) {
+		t.Fatal("Incorrect CandVotes")
+	}
+	_t = TallySTV{}
+	res = _t.Tally(e)
+	if !ArEq(res, []int{1, 0, 2}) {
+		t.Fatal("Incorrect stv result", res)
+	}
+}
+
+func TestFirst(t *testing.T) {
+	tally := &TallySTV{
+		Ignore: make(Ints, 0),
+	}
+
+	v := &Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4}
+
+	f := tally.first(v)
+	if f != 1 {
+		t.Fatal("Incorrect first", f)
+	}
+
+	tally.Ignore = append(tally.Ignore, 1)
+	f = tally.first(&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4})
+	if f != 2 {
+		t.Fatal("Incorrect first", f)
+	}
+
+	tally.Ignore = append(tally.Ignore, 2)
+	f = tally.first(&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4})
+	if f != 0 {
+		t.Fatal("Incorrect first", f)
+	}
 }
