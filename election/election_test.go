@@ -309,3 +309,27 @@ func TestRemoveCandidate(t *testing.T) {
 		t.Fatal("Incorrect candidate removal", v2.C)
 	}
 }
+
+func TestCandVotes(t *testing.T) {
+	e := &Election{V: []*Vote{
+		&Vote{C: map[string]int{"0": 0, "1": 1, "2": 2}, W: 4},
+		&Vote{C: map[string]int{"0": 0, "1": 2, "2": 1}, W: 2},
+		&Vote{C: map[string]int{"0": 1, "1": 0, "2": 2}, W: 8},
+		&Vote{C: map[string]int{"0": 1, "1": 2, "2": 0}, W: 4},
+		&Vote{C: map[string]int{"0": 2, "1": 0, "2": 1}, W: 1},
+		&Vote{C: map[string]int{"0": 2, "1": 1, "2": 0}, W: 1}},
+		N: 3,
+	}
+
+	v1 := &Vote{C: map[string]int{"0": 1, "1": 0}, W: 1}
+	v2 := &Vote{C: map[string]int{"0": 0, "1": 1}, W: 2}
+	e = &Election{V: []*Vote{v1, v2}, N: 2}
+
+	v := e.CandVotes()
+	if len(v[0]) != 2 {
+		t.Fatal("Incorrect Size", len(v[0]), tojson(v[0]))
+	}
+	if tojson(v[0][0]) != tojson(v2) {
+		t.Fatal("Incorrect element", tojson(v[0][0]))
+	}
+}

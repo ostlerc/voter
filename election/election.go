@@ -518,9 +518,18 @@ func NewVote(w int) *Vote {
 	}
 }
 
-func GetName(M map[string]string, v string) string {
-	if s, ok := M[v]; ok {
-		return s
+func (e *Election) CandVotes() VoteM {
+	res := make(VoteM, e.N, e.N)
+	for i := 0; i < e.N; i++ {
+		res[i] = make(VoteAr, 0)
 	}
-	return v
+
+	for _, v := range e.V {
+		idx := v.C["0"]
+		for x := 0; x < v.W; x++ {
+			//fmt.Println(idx, e.N, len(v.C))
+			res[idx] = append(res[idx], v.Copy())
+		}
+	}
+	return res
 }

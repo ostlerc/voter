@@ -1,8 +1,13 @@
 package election
 
-import "strconv"
+import (
+	"encoding/json"
+	"strconv"
+)
 
 type Ints []int
+type VoteAr []*Vote
+type VoteM []VoteAr
 
 type IntPair struct {
 	First  int `json:"a"`
@@ -169,4 +174,57 @@ func (i Ints) Minus(ignore Ints) Ints {
 		res = append(res, v)
 	}
 	return res
+}
+
+func (v VoteM) Maxi(ignore Ints) int {
+	max := -1
+	maxi := -1
+	for i, v := range v {
+		if Contains(i, ignore) {
+			continue
+		}
+		if max == -1 || max < len(v) {
+			maxi = i
+			max = len(v)
+		}
+	}
+	return maxi
+}
+
+func (v VoteM) Mini(ignore Ints) int {
+	min := -1
+	mini := -1
+	for i, v := range v {
+		if Contains(i, ignore) {
+			continue
+		}
+		if min == -1 || min >= len(v) {
+			mini = i
+			min = len(v)
+		}
+	}
+	return mini
+}
+
+func (v VoteM) Lens() []int {
+	res := make([]int, len(v))
+	for i, v := range v {
+		res[i] = len(v)
+	}
+	return res
+}
+
+func tojson(i interface{}) string {
+	dat, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	return string(dat)
+}
+
+func GetName(M map[string]string, v string) string {
+	if s, ok := M[v]; ok {
+		return s
+	}
+	return v
 }

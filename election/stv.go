@@ -1,12 +1,6 @@
 package election
 
-import (
-	"encoding/json"
-	"strconv"
-)
-
-type VoteAr []*Vote
-type VoteM []VoteAr
+import "strconv"
 
 type TallySTV struct {
 	Droop  int
@@ -16,14 +10,6 @@ type TallySTV struct {
 	Start  int
 	End    int
 	res    Ints
-}
-
-func tojson(i interface{}) string {
-	dat, err := json.Marshal(i)
-	if err != nil {
-		panic(err)
-	}
-	return string(dat)
 }
 
 func init() {
@@ -54,22 +40,6 @@ func (t *TallySTV) STV() []int {
 		t.step()
 	}
 	return t.res
-}
-
-func (e *Election) CandVotes() VoteM {
-	res := make(VoteM, e.N, e.N)
-	for i := 0; i < e.N; i++ {
-		res[i] = make(VoteAr, 0)
-	}
-
-	for _, v := range e.V {
-		idx := v.C["0"]
-		for x := 0; x < v.W; x++ {
-			//fmt.Println(idx, e.N, len(v.C))
-			res[idx] = append(res[idx], v.Copy())
-		}
-	}
-	return res
 }
 
 //distributes from i to scores.
@@ -138,42 +108,4 @@ func (t *TallySTV) first(v *Vote) int {
 	}
 
 	return -1
-}
-
-func (v VoteM) Maxi(ignore Ints) int {
-	max := -1
-	maxi := -1
-	for i, v := range v {
-		if Contains(i, ignore) {
-			continue
-		}
-		if max == -1 || max < len(v) {
-			maxi = i
-			max = len(v)
-		}
-	}
-	return maxi
-}
-
-func (v VoteM) Mini(ignore Ints) int {
-	min := -1
-	mini := -1
-	for i, v := range v {
-		if Contains(i, ignore) {
-			continue
-		}
-		if min == -1 || min >= len(v) {
-			mini = i
-			min = len(v)
-		}
-	}
-	return mini
-}
-
-func (v VoteM) Lens() []int {
-	res := make([]int, len(v))
-	for i, v := range v {
-		res[i] = len(v)
-	}
-	return res
 }
